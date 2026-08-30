@@ -32,7 +32,7 @@ export function Meter({ value, max }: { value: number; max: number }) {
     >
       <div
         className="h-full rounded-full"
-        style={{ width: `${pct}%`, background: over ? 'var(--c-risk)' : 'var(--c-accent)' }}
+        style={{ width: `${pct}%`, background: over ? 'var(--c-risk)' : 'var(--c-spark)' }}
       />
     </div>
   );
@@ -54,7 +54,7 @@ export function Chip({
   const [bg, fg] = map[tone];
   return (
     <span
-      className="num inline-flex items-center rounded-full px-2 py-0.5 text-[11.5px] font-semibold"
+      className="num inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[11.5px] font-semibold"
       style={{ background: bg, color: fg }}
     >
       {children}
@@ -77,18 +77,24 @@ export function Stat({
   value,
   tone,
   sub,
+  big,
 }: {
   label: string;
   value: string;
   tone?: 'accent' | 'risk' | 'warn';
   sub?: string;
+  /** The one figure the page exists to show. Exactly one per screen. */
+  big?: boolean;
 }) {
   const color =
     tone === 'risk' ? 'var(--c-risk)' : tone === 'warn' ? 'var(--c-warn)' : tone === 'accent' ? 'var(--c-accent)' : 'var(--c-ink)';
   return (
     <div>
       <p className="label">{label}</p>
-      <p className="num mt-0.5 text-[19px] font-semibold" style={{ color }}>
+      <p
+        className={`num mt-0.5 font-semibold ${big ? 'text-[30px] leading-none tracking-tight' : 'text-[19px]'}`}
+        style={{ color }}
+      >
         {value}
       </p>
       {sub && <p className="mt-0.5 text-[12px] text-ink3">{sub}</p>}
@@ -96,9 +102,11 @@ export function Stat({
   );
 }
 
+// Ordered by prominence: the spark takes the largest slice, then the teal family
+// steps down, then the warm neutrals. Distinguishable in both themes.
 const DONUT_COLORS = [
-  '#0e7c5a', '#3f8f7a', '#6fa08c', '#9c6413', '#c08a3e',
-  '#a63a52', '#7a5a8f', '#4a6fa5', '#5f8f4a', '#8b9089',
+  '#ecff68', '#017d66', '#35c4a1', '#9c6413', '#c9a227',
+  '#a63a52', '#6f7f9c', '#7a8f5a', '#c07a3e', '#8b9089',
 ];
 
 export function donutColor(i: number) {

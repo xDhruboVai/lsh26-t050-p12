@@ -45,7 +45,8 @@ export default function CaseBar() {
         </label>
         <select
           id="case-select"
-          className="field w-auto max-w-[104px] flex-none py-1.5 text-[13px]"
+          className="field w-auto max-w-[104px] flex-none py-2 text-[13px]"
+          style={{ minHeight: 40 }}
           value={CASE_IDS.includes(ledger.caseId) ? ledger.caseId : ''}
           onChange={(e) => loadCaseId(e.target.value)}
         >
@@ -59,7 +60,8 @@ export default function CaseBar() {
 
         <button
           type="button"
-          className="btn btn-ghost flex-none px-3 py-1.5 text-[13px]"
+          className="btn btn-ghost flex-none px-3 text-[13px]"
+          style={{ minHeight: 40 }}
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
         >

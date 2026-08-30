@@ -23,7 +23,7 @@ export default function PocketsPage() {
       </div>
 
       {/* Where the money to save actually comes from */}
-      <Card>
+      <Card className="card-lead">
         <SectionTitle hint={monthLabel(f.month)}>Monthly surplus</SectionTitle>
         <div className="flex items-baseline justify-between">
           <p
@@ -181,7 +181,7 @@ function PocketCard({
 
           <button
             type="button"
-            className="mt-3 text-[12.5px] font-semibold"
+            className="tap mt-1 text-[12.5px] font-semibold"
             style={{ color: 'var(--c-accent)' }}
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}

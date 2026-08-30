@@ -131,7 +131,11 @@ scripts/verify.ts     25-case invariant harness
 
 Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · `@anthropic-ai/sdk` (`claude-sonnet-5`, receipt vision) · Zustand · deployed on Vercel.
 
-No chart library and no date library: the donut and bars are hand-drawn SVG and CSS, and `lib/dates.ts` is a few dozen lines. Both were dropped deliberately — fewer dependencies, no hydration surprises, and a shorter `LICENSES.md`. No webfont either; the system stack renders instantly on the phone this is designed for.
+No chart library and no date library: the donut and bars are hand-drawn SVG and CSS, and `lib/dates.ts` is a few dozen lines. Both were dropped deliberately — fewer dependencies, no hydration surprises, and a shorter `LICENSES.md`.
+
+Typefaces are Instrument Sans and IBM Plex Mono, downloaded and self-hosted at build time by `next/font`, so there is no runtime request and nothing to fail offline. Every money figure uses the mono face for tabular figures, so digits line up in columns.
+
+Colour is a deep teal (`#017d66`) doing the structural work with a single acid-lime spark (`#ecff68`) reserved for fills — the spend meter and the primary action. The lime is never used as text: it scores 1.10 against white. Every text/background pair in both themes was checked and passes WCAG AA.
 
 Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 

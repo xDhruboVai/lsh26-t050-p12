@@ -64,7 +64,8 @@ npx license-checker --production --summary
 
 | Asset | Source | Licence |
 |---|---|---|
-| Typefaces | None bundled. The app uses the operating system's own UI and monospace stacks. | n/a |
+| Instrument Sans | Google Fonts, via `next/font` (downloaded and self-hosted at build time) | SIL Open Font License 1.1 |
+| IBM Plex Mono | Google Fonts, via `next/font` (downloaded and self-hosted at build time) | SIL Open Font License 1.1 |
 | Tab bar and app icons | Drawn by the team as inline SVG paths | Original work |
 | Charts | Donut and bars are hand-drawn SVG and CSS; no chart library | Original work |
 

@@ -25,13 +25,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Spend against salary */}
-      <Card>
+      <Card className="card-lead">
         <div className="flex items-end justify-between gap-3">
           <Stat
             label="Spent this month"
             value={fmt(s.totalPaisa, { paisa: false })}
             tone={s.leftPaisa < 0 ? 'risk' : undefined}
             sub={`${s.count} expenses`}
+            big
           />
           <div className="text-right">
             <p className="label">Salary</p>
@@ -59,7 +60,7 @@ export default function DashboardPage() {
           <p className="text-[14px] text-ink2">No spending recorded for {monthLabel(ledger.months.last)}.</p>
         ) : (
           <>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
               <Chip tone={s.deltaPaisa > 0 ? 'risk' : 'good'}>
                 {s.deltaPaisa > 0 ? '+' : ''}
                 {fmt(s.deltaPaisa, { paisa: false }).replace('BDT ', '')} ({s.deltaPct > 0 ? '+' : ''}

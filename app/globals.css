@@ -1,19 +1,22 @@
 @import "tailwindcss";
 
 /*
- * No webfont. The venue network is not worth a build dependency, and a system
- * stack renders instantly on the phone this app is designed for.
+ * Typefaces come from next/font in app/layout.tsx, which downloads and
+ * self-hosts them at build time. Vercel builds run on their network, not the
+ * venue's, so there is no request at runtime and nothing to fail offline.
  */
 :root {
-  --c-ground: #f4f2ed;
+  --c-ground: #f5f4ef;
   --c-surface: #ffffff;
-  --c-surface2: #eae7e0;
-  --c-ink: #1a1d1a;
-  --c-ink2: #5a5f58;
-  --c-ink3: #8b9089;
-  --c-rule: #dcd8d0;
-  --c-accent: #0e7c5a;
-  --c-accent-soft: #dff0e8;
+  --c-surface2: #ecebe3;
+  --c-ink: #14180f;
+  --c-ink2: #545a4d;
+  --c-ink3: #66716a;
+  --c-rule: #dedbd1;
+  --c-accent: #017d66;
+  --c-accent-soft: #d8f0e7;
+  --c-spark: #ecff68;
+  --c-spark-ink: #12160f;
   --c-warn: #9c6413;
   --c-warn-soft: #f7ebd8;
   --c-risk: #a63a52;
@@ -22,15 +25,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --c-ground: #0e1512;
-    --c-surface: #151e19;
-    --c-surface2: #1e2a24;
-    --c-ink: #e8ede9;
-    --c-ink2: #a0aaa4;
-    --c-ink3: #6e7972;
-    --c-rule: #27332d;
-    --c-accent: #40c08f;
-    --c-accent-soft: #12332a;
+    --c-ground: #0d1410;
+    --c-surface: #141c16;
+    --c-surface2: #1d2820;
+    --c-ink: #e9eee7;
+    --c-ink2: #a2ada4;
+    --c-ink3: #8b9a93;
+    --c-rule: #26332b;
+    --c-accent: #35c4a1;
+    --c-accent-soft: #10322a;
+    --c-spark: #ecff68;
+    --c-spark-ink: #12160f;
     --c-warn: #d9a055;
     --c-warn-soft: #31250f;
     --c-risk: #e0788c;
@@ -52,9 +57,10 @@
   --color-warn-soft: var(--c-warn-soft);
   --color-risk: var(--c-risk);
   --color-risk-soft: var(--c-risk-soft);
+  --color-spark: var(--c-spark);
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Consolas, monospace;
 }
 
 html {
@@ -91,6 +97,19 @@ body {
   border-radius: 12px;
 }
 
+/* One card per page carries the answer. It gets the weight; the rest recede. */
+.card-lead {
+  border-color: color-mix(in srgb, var(--c-accent) 32%, var(--c-rule));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.16);
+}
+
+/* Tap-safe inline control, for text buttons that are not .btn */
+.tap {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .field {
   width: 100%;
   background: var(--c-surface);
@@ -110,6 +129,7 @@ body {
 
 .btn {
   border-radius: 9px;
+  min-height: 44px;
   padding: 12px 16px;
   font-weight: 600;
   font-size: 15px;
@@ -120,13 +140,8 @@ body {
   cursor: not-allowed;
 }
 .btn-primary {
-  background: var(--c-accent);
-  color: #fff;
-}
-@media (prefers-color-scheme: dark) {
-  .btn-primary {
-    color: #06120d;
-  }
+  background: var(--c-spark);
+  color: var(--c-spark-ink);
 }
 .btn-ghost {
   background: var(--c-surface);
