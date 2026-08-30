@@ -33,18 +33,19 @@ export default function ForecastPage() {
 
       {/* Headline */}
       <Card className="card-lead">
-        <div className="grid grid-cols-2 gap-4">
+        <Stat
+          label={short ? 'Short at month end' : 'Left at month end'}
+          value={fmt(Math.abs(f.projectedLeftPaisa), { paisa: false })}
+          tone={short ? 'risk' : 'accent'}
+          sub="if nothing changes"
+          big
+        />
+
+        <div className="mt-3 border-t border-rule pt-3">
           <Stat
             label="Still to spend"
             value={fmt(f.restOfMonthPaisa, { paisa: false })}
-            sub={`over ${f.daysRemaining} days`}
-          />
-          <Stat
-            label={short ? 'Short at month end' : 'Left at month end'}
-            value={fmt(Math.abs(f.projectedLeftPaisa), { paisa: false })}
-            tone={short ? 'risk' : 'accent'}
-            sub={short ? 'if nothing changes' : 'if nothing changes'}
-            big
+            sub={`over the remaining ${f.daysRemaining} days`}
           />
         </div>
 

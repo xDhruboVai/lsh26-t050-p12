@@ -147,7 +147,7 @@ export function buildInsights(state: LedgerState, f: Forecast): Insight[] {
     if (delta > 0 && (!rise || delta > rise.delta)) rise = { category, delta, now: paisa, before };
   }
   if (rise) {
-    const pctPart = rise.before > 0 ? ' (' + pctOf(rise.delta, rise.before) + '% more)' : '';
+    const isNew = rise.before === 0;
     candidates.push({
       id: 'biggest-rise',
       kind: 'biggest-rise',
@@ -155,9 +155,12 @@ export function buildInsights(state: LedgerState, f: Forecast): Insight[] {
       amountPaisa: rise.delta,
       tone: 'warn',
       weight: 90 + pctOf(rise.delta, Math.max(1, rise.before)) / 10,
-      text:
-        rise.category + ' is up ' + tk(rise.delta) + ' against ' + lastLabel + pctPart + ' — ' +
-        tk(rise.now) + ' versus ' + tk(rise.before) + '.',
+      text: isNew
+        ? rise.category + ' is new this month at ' + tk(rise.now) + ' — you spent nothing on it in ' +
+          lastLabel + '.'
+        : rise.category + ' is up ' + tk(rise.delta) + ' against ' + lastLabel + ' (' +
+          pctOf(rise.delta, rise.before) + '% more) — ' + tk(rise.now) + ' versus ' +
+          tk(rise.before) + '.',
     });
   }
 

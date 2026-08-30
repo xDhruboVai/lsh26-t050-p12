@@ -20,15 +20,36 @@ const plexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
+const DESCRIPTION =
+  'Record spending with almost no typing, see where the month went, forecast the rest of it, ' +
+  'and put a real date on every savings goal.';
+
 export const metadata: Metadata = {
+  // Vercel sets VERCEL_URL on every deployment; the fallback keeps local dev quiet.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
+  ),
   title: 'Ledger — Personal Ledger Manager',
-  description:
-    'Record spending with almost no typing, see where the month went, forecast the rest of it, and put a real date on every savings goal.',
+  description: DESCRIPTION,
+  applicationName: 'Ledger',
   manifest: '/manifest.json',
+  appleWebApp: { capable: true, title: 'Ledger', statusBarStyle: 'black-translucent' },
+  openGraph: {
+    type: 'website',
+    siteName: 'Ledger',
+    title: 'Ledger — see where the month went',
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ledger — see where the month went',
+    description: DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0e7c5a',
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f5f4ef" }, { media: "(prefers-color-scheme: dark)", color: "#0d1410" }],
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
