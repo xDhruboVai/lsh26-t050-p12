@@ -55,7 +55,8 @@ export default function AuthForm({
             <span className="label mb-1.5 block">Your name</span>
             <input
               name="name"
-              className="field"
+              disabled={pending}
+              className="field disabled:opacity-60"
               autoComplete="name"
               placeholder="Rafi"
               defaultValue={kept.name ?? ''}
@@ -69,14 +70,15 @@ export default function AuthForm({
             name="email"
             type="email"
             required
-            className="field"
+            disabled={pending}
+            className="field disabled:opacity-60"
             autoComplete="email"
             inputMode="email"
             placeholder="you@example.com"
             defaultValue={kept.email ?? ''}
-            aria-invalid={state.field === 'email' || undefined}
+            aria-invalid={!pending && state.field === 'email' ? true : undefined}
           />
-          {state.field === 'email' && state.error && (
+          {!pending && state.field === 'email' && state.error && (
             <span className="mt-1.5 block text-[13px]" style={{ color: 'var(--c-risk)' }}>
               {state.error}
             </span>
@@ -89,11 +91,12 @@ export default function AuthForm({
             name="password"
             type="password"
             required
-            className="field"
+            disabled={pending}
+            className="field disabled:opacity-60"
             autoComplete={isSignUp ? 'new-password' : 'current-password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            aria-invalid={state.field === 'password' || undefined}
+            aria-invalid={!pending && state.field === 'password' ? true : undefined}
           />
 
           {isSignUp && (
@@ -116,7 +119,7 @@ export default function AuthForm({
             </ul>
           )}
 
-          {state.field === 'password' && state.error && (
+          {!pending && state.field === 'password' && state.error && (
             <span className="mt-1.5 block text-[13px]" style={{ color: 'var(--c-risk)' }}>
               {state.error}
             </span>
@@ -128,7 +131,8 @@ export default function AuthForm({
             <span className="label mb-1.5 block">Monthly salary (optional)</span>
             <input
               name="salary"
-              className="field num"
+              disabled={pending}
+              className="field num disabled:opacity-60"
               inputMode="numeric"
               placeholder="50000"
               defaultValue={kept.salary ?? ''}
@@ -140,7 +144,7 @@ export default function AuthForm({
         )}
 
         {/* Anything not already shown beside the field it belongs to. */}
-        {state.error && state.field !== 'email' && state.field !== 'password' && (
+        {!pending && state.error && state.field !== 'email' && state.field !== 'password' && (
           <p
             role="alert"
             className="rounded-xl px-3.5 py-2.5 text-[13.5px]"
@@ -152,17 +156,41 @@ export default function AuthForm({
 
         <button
           type="submit"
-          className="btn btn-primary w-full"
+          className="btn btn-primary w-full flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
           disabled={pending || (isSignUp && !passwordReady)}
         >
-          {pending
-            ? isSignUp
-              ? 'Creating your ledger…'
-              : 'Signing in…'
-            : isSignUp
-              ? 'Create account'
-              : 'Sign in'}
+          {pending && (
+            <svg
+              className="animate-spin h-4 w-4 text-current"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          )}
+          <span>
+            {pending
+              ? isSignUp
+                ? 'Creating your ledger…'
+                : 'Signing in…'
+              : isSignUp
+                ? 'Create account'
+                : 'Sign in'}
+          </span>
         </button>
+
+        {pending && (
+          <p className="text-center text-[12.5px] text-ink3 animate-pulse">
+            Connecting to secure database… please hold on.
+          </p>
+        )}
       </form>
 
       {demo && (

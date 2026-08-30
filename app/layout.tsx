@@ -22,15 +22,23 @@ const DESCRIPTION =
   'Record spending with almost no typing, see where the month went, forecast the rest of it, ' +
   'and put a real date on every savings goal.';
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '') ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://hackathon-lofi.vercel.app');
+
 export const metadata: Metadata = {
-  // Vercel sets VERCEL_URL on every deployment; the fallback keeps local dev quiet.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ??
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
-  ),
+  metadataBase: new URL(SITE_URL),
   title: 'Ledger — Personal Ledger Manager',
   description: DESCRIPTION,
   applicationName: 'Ledger',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   manifest: '/manifest.json',
   appleWebApp: { capable: true, title: 'Ledger', statusBarStyle: 'black-translucent' },
   openGraph: {
@@ -38,11 +46,21 @@ export const metadata: Metadata = {
     siteName: 'Ledger',
     title: 'Ledger — see where the month went',
     description: DESCRIPTION,
+    url: SITE_URL,
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Ledger — see where the month went, and when each goal lands',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ledger — see where the month went',
     description: DESCRIPTION,
+    images: ['/opengraph-image'],
   },
 };
 
