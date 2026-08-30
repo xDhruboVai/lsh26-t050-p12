@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /**
  * Reads amount, date and shop from a photo of a bill, using Gemini 2.0 Flash.

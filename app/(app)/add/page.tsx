@@ -57,17 +57,54 @@ export default function AddPage() {
   const amountValid = /^\d+(\.\d{1,2})?$/.test(amount.trim());
   const canSave = amountValid && /^\d{4}-\d{2}-\d{2}$/.test(date) && shop.trim().length > 0;
 
-  async function onPick(file: File) {
-    setStatus('reading');
-    setErrorMsg('');
-    setRead(null);
-
+  /**
+   * Phone cameras produce 2-8MB photos, and base64 inflates them by a third,
+   * which blows past the request-body limit on a serverless deployment: the
+   * upload never reaches the reader and the browser reports a network error.
+   *
+   * Downscaling to 1600px on the long edge keeps every printed figure legible
+   * while landing well under the limit, and it makes the read faster too.
+   */
+  async function shrink(file: File): Promise<string> {
     const dataUrl = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result));
       reader.onerror = () => reject(new Error('Could not open that file.'));
       reader.readAsDataURL(file);
-    }).catch((e: Error) => {
+    });
+
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error('not an image'));
+        el.src = dataUrl;
+      });
+
+      const MAX = 1600;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return dataUrl;
+      ctx.drawImage(img, 0, 0, w, h);
+      return canvas.toDataURL('image/jpeg', 0.82);
+    } catch {
+      // A format the canvas cannot decode still gets its chance at the reader.
+      return dataUrl;
+    }
+  }
+
+  async function onPick(file: File) {
+    setStatus('reading');
+    setErrorMsg('');
+    setRead(null);
+
+    const dataUrl = await shrink(file).catch((e: Error) => {
       setErrorMsg(e.message);
       setStatus('error');
       return '';
@@ -76,11 +113,13 @@ export default function AddPage() {
 
     setPreview(dataUrl);
 
+    const mediaType = /^data:([^;,]+)/.exec(dataUrl)?.[1] ?? file.type ?? 'image/jpeg';
+
     try {
       const res = await fetch('/api/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl, mediaType: file.type || 'image/jpeg' }),
+        body: JSON.stringify({ image: dataUrl, mediaType }),
       });
       const data = (await res.json()) as Extracted;
 
@@ -102,7 +141,7 @@ export default function AddPage() {
 
       setStatus('review');
     } catch {
-      setErrorMsg('Network error reaching the reader. Enter the fields by hand.');
+      setErrorMsg('Could not reach the reader — the photo may be too large or the connection dropped. Enter the fields by hand.');
       setStatus('error');
     }
   }
