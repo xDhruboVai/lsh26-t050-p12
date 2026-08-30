@@ -1,13 +1,14 @@
 'use client';
 
-import { useRef } from 'react';
-import { useLedger } from '../lib/store';
+import { useState } from 'react';
+import { createLedgerStore, LedgerContext } from '../lib/store';
 import type { LedgerState } from '../lib/types';
 
 /**
- * Seeds the client store from the server-rendered ledger, once, before the
- * first paint. Keeping the store means every engine and screen carries over
- * from the fixture version unchanged.
+ * Creates one store per render tree, seeded with the ledger the server already
+ * loaded. Because the data is there before the first render, the pages render
+ * complete on the server instead of flashing an empty state, and no state is
+ * shared between concurrent requests.
  */
 export default function LedgerProvider({
   initial,
@@ -16,10 +17,6 @@ export default function LedgerProvider({
   initial: LedgerState;
   children: React.ReactNode;
 }) {
-  const done = useRef(false);
-  if (!done.current) {
-    useLedger.setState({ ledger: initial });
-    done.current = true;
-  }
-  return <>{children}</>;
+  const [store] = useState(() => createLedgerStore(initial));
+  return <LedgerContext.Provider value={store}>{children}</LedgerContext.Provider>;
 }

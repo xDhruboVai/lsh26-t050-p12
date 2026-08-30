@@ -91,12 +91,42 @@ export default function ProfileForm({
       </Card>
 
       <Card>
-        <SectionTitle>Security</SectionTitle>
-        <ul className="flex flex-col gap-1.5 text-[13px] text-ink2">
-          <li>Password stored as a salted scrypt hash, never in plain text.</li>
-          <li>Sessions are opaque tokens; only their hash is kept, so they can be revoked.</li>
-          <li>Five wrong passwords locks the account for fifteen minutes.</li>
-          <li>Your data is scoped to your account on every query.</li>
+        <SectionTitle>Keeping your money private</SectionTitle>
+        <ul className="flex flex-col gap-3">
+          {[
+            {
+              title: 'Nobody can read your password',
+              body: 'Not us either. It is scrambled before it is saved, and there is no way to turn it back.',
+            },
+            {
+              title: 'Only you see your spending',
+              body: 'Your expenses and pockets are tied to this account. No other user can reach them.',
+            },
+            {
+              title: 'Guessing gets locked out',
+              body: 'After five wrong passwords the account is locked for fifteen minutes.',
+            },
+            {
+              title: 'Signing out really signs you out',
+              body: 'It ends the session on this device straight away, not just in this tab.',
+            },
+          ].map((item) => (
+            <li key={item.title} className="flex gap-3">
+              <span
+                className="mt-0.5 flex-none"
+                aria-hidden="true"
+                style={{ color: 'var(--c-accent)' }}
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12.5l5.5 5.5L20 7" />
+                </svg>
+              </span>
+              <span>
+                <span className="block text-[13.5px] font-semibold">{item.title}</span>
+                <span className="block text-[13px] text-ink2">{item.body}</span>
+              </span>
+            </li>
+          ))}
         </ul>
       </Card>
     </>

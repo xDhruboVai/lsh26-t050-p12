@@ -8,7 +8,8 @@
     "start": "next start",
     "verify": "tsx scripts/verify.ts",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "goalcheck": "tsx scripts/goalcheck.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

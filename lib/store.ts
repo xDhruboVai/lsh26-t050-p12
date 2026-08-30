@@ -1,6 +1,7 @@
 'use client';
 
-import { create } from 'zustand';
+import { createContext, useContext } from 'react';
+import { createStore, useStore } from 'zustand';
 
 import { buildSummary } from './engine/summary';
 import { buildForecast } from './engine/forecast';
@@ -10,15 +11,21 @@ import { monthKey, addMonths } from './dates';
 import type { Expense, LedgerState, Pocket } from './types';
 
 /**
- * The store is seeded from the server by LedgerProvider, then written through
- * to /api/ledger on every change.
+ * The store is created PER REQUEST and seeded from the server by
+ * LedgerProvider, then written through to /api/ledger on every change.
+ *
+ * It must not be module-level. A module-level store is shared by every
+ * concurrent server render, so one user's ledger could be seeded into the
+ * module and rendered into another user's HTML. Creating it per provider also
+ * means the data is present during server rendering, so the page does not
+ * paint an empty state and then fill in.
  *
  * Local state updates first and the request follows. A dropped write shows an
  * error rather than silently diverging, because the alternative is a figure on
  * screen that is not in the database.
  */
 
-const EMPTY: LedgerState = {
+export const EMPTY_LEDGER: LedgerState = {
   caseId: '',
   today: new Date().toISOString().slice(0, 10),
   months: {
@@ -68,7 +75,8 @@ function debounce<A extends unknown[]>(fn: (...args: A) => void, ms: number) {
   };
 }
 
-export const useLedger = create<Store>()((set, get) => {
+export function createLedgerStore(initial: LedgerState) {
+  return createStore<Store>()((set, get) => {
   const fail = (e: unknown) =>
     set({ saveError: e instanceof Error ? e.message : 'Could not save that change.' });
 
@@ -81,7 +89,7 @@ export const useLedger = create<Store>()((set, get) => {
   }, 500);
 
   return {
-    ledger: EMPTY,
+    ledger: initial,
     saveError: null,
     clearError: () => set({ saveError: null }),
 
@@ -167,8 +175,23 @@ export const useLedger = create<Store>()((set, get) => {
         throw e;
       }
     },
-  };
-});
+    };
+  });
+}
+
+export type LedgerStore = ReturnType<typeof createLedgerStore>;
+
+export const LedgerContext = createContext<LedgerStore | null>(null);
+
+/**
+ * Same call signature as before, so every screen is unchanged: the store just
+ * comes from the provider above it rather than from module scope.
+ */
+export function useLedger<T>(selector: (state: Store) => T): T {
+  const store = useContext(LedgerContext);
+  if (!store) throw new Error('useLedger must be used inside <LedgerProvider>.');
+  return useStore(store, selector);
+}
 
 /**
  * Derived views. These recompute on every read rather than being stored, which
