@@ -1,9 +1,9 @@
 'use client';
 
-import { useForecast, useLedger } from '../../lib/store';
-import { fmt } from '../../lib/money';
-import { monthLabel, monthLabelShort } from '../../lib/dates';
-import { Card, Chip, EmptyState, SectionTitle, Stat } from '../../components/ui';
+import { useForecast, useLedger } from '../../../lib/store';
+import { fmt } from '../../../lib/money';
+import { monthLabel, monthLabelShort } from '../../../lib/dates';
+import { Card, Chip, EmptyState, SectionTitle, Stat } from '../../../components/ui';
 
 /** Bullet 3 — forecast for the rest of the month, and insights from the numbers. */
 export default function ForecastPage() {

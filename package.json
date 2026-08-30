@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "verify": "tsx scripts/verify.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx scripts/migrate.ts"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -21,8 +23,8 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.7.0",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
   },
   "license": "MIT",
   "description": "Personal Ledger Manager — LofiStack Hackathon 2026, problem P12"

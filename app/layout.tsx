@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Instrument_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
-import TabBar from '../components/TabBar';
-import CaseBar from '../components/CaseBar';
 
 // Downloaded and self-hosted at build time: no runtime request, no FOUT.
 const instrument = Instrument_Sans({
@@ -58,13 +56,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${instrument.variable} ${plexMono.variable}`}>
-      <body className="min-h-dvh">
-        <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col">
-          <CaseBar />
-          <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
-          <TabBar />
-        </div>
-      </body>
+      <body className="min-h-dvh">{children}</body>
     </html>
   );
 }

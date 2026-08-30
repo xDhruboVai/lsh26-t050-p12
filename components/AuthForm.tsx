@@ -1,0 +1,134 @@
+'use client';
+
+import Link from 'next/link';
+import { useActionState } from 'react';
+import type { FormState } from '../app/actions/auth';
+
+export default function AuthForm({
+  mode,
+  action,
+  demo,
+}: {
+  mode: 'signin' | 'signup';
+  action: (prev: FormState, form: FormData) => Promise<FormState>;
+  demo?: { email: string; password: string };
+}) {
+  const [state, formAction, pending] = useActionState(action, {} as FormState);
+  const isSignUp = mode === 'signup';
+
+  return (
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-10">
+      <div className="mb-7">
+        <svg width="42" height="42" viewBox="0 0 64 64" aria-hidden="true" className="mb-4">
+          <rect width="64" height="64" rx="14" fill="var(--c-spark-ink)" />
+          <rect x="12" y="20" width="40" height="8" rx="4" fill="#2a3327" />
+          <rect x="12" y="20" width="27" height="8" rx="4" fill="var(--c-spark)" />
+          <rect x="12" y="36" width="40" height="8" rx="4" fill="#2a3327" />
+          <rect x="12" y="36" width="16" height="8" rx="4" fill="#35c4a1" />
+        </svg>
+        <h1 className="text-[26px] font-bold tracking-tight">
+          {isSignUp ? 'Create your ledger' : 'Welcome back'}
+        </h1>
+        <p className="mt-1 text-[14px] text-ink2">
+          {isSignUp
+            ? 'One place for what you spend and what you are saving for.'
+            : 'Sign in to pick up where the month left off.'}
+        </p>
+      </div>
+
+      <form action={formAction} className="card flex flex-col gap-4 p-5">
+        {isSignUp && (
+          <label className="block">
+            <span className="label mb-1.5 block">Your name</span>
+            <input name="name" className="field" autoComplete="name" placeholder="Rafi" />
+          </label>
+        )}
+
+        <label className="block">
+          <span className="label mb-1.5 block">Email</span>
+          <input
+            name="email"
+            type="email"
+            required
+            className="field"
+            autoComplete="email"
+            inputMode="email"
+            placeholder="you@example.com"
+            aria-invalid={state.field === 'email' || undefined}
+          />
+        </label>
+
+        <label className="block">
+          <span className="label mb-1.5 block">Password</span>
+          <input
+            name="password"
+            type="password"
+            required
+            className="field"
+            autoComplete={isSignUp ? 'new-password' : 'current-password'}
+            placeholder={isSignUp ? 'At least 10 characters' : ''}
+            aria-invalid={state.field === 'password' || undefined}
+          />
+          {isSignUp && (
+            <span className="mt-1.5 block text-[12px] text-ink3">
+              At least 10 characters, with a letter and a number.
+            </span>
+          )}
+        </label>
+
+        {isSignUp && (
+          <label className="block">
+            <span className="label mb-1.5 block">Monthly salary (optional)</span>
+            <input
+              name="salary"
+              className="field num"
+              inputMode="numeric"
+              placeholder="50000"
+            />
+            <span className="mt-1.5 block text-[12px] text-ink3">
+              You can change this any time in your profile.
+            </span>
+          </label>
+        )}
+
+        {state.error && (
+          <p
+            role="alert"
+            className="rounded-xl px-3.5 py-2.5 text-[13.5px]"
+            style={{ background: 'var(--c-risk-soft)', color: 'var(--c-risk)' }}
+          >
+            {state.error}
+          </p>
+        )}
+
+        <button type="submit" className="btn btn-primary w-full" disabled={pending}>
+          {pending
+            ? isSignUp
+              ? 'Creating your ledger…'
+              : 'Signing in…'
+            : isSignUp
+              ? 'Create account'
+              : 'Sign in'}
+        </button>
+      </form>
+
+      {demo && (
+        <div className="card mt-4 p-4">
+          <p className="label mb-1.5">Just looking?</p>
+          <p className="text-[13.5px] text-ink2">
+            Sign in with <span className="num">{demo.email}</span> and{' '}
+            <span className="num">{demo.password}</span> to see a ledger with two months of
+            spending already in it.
+          </p>
+        </div>
+      )}
+
+      <p className="mt-5 text-center text-[14px] text-ink2">
+        {isSignUp ? 'Already have an account? ' : 'No account yet? '}
+        <Link href={isSignUp ? '/login' : '/signup'} className="font-semibold" style={{ color: 'var(--c-accent)' }}>
+          {isSignUp ? 'Sign in' : 'Create one'}
+        </Link>
+      </p>
+    </div>
+  );
+}

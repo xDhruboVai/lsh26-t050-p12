@@ -2,10 +2,10 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLedger } from '../../lib/store';
-import { fmt, parsePaisa } from '../../lib/money';
-import { CATEGORIES, type Category } from '../../lib/types';
-import { Card, Chip, SectionTitle } from '../../components/ui';
+import { useLedger } from '../../../lib/store';
+import { fmt, parsePaisa } from '../../../lib/money';
+import { CATEGORIES, type Category } from '../../../lib/types';
+import { Card, Chip, SectionTitle } from '../../../components/ui';
 
 /** Below this, a field is shown blank and flagged rather than pre-filled. */
 const SURE_ENOUGH = 0.75;
@@ -29,6 +29,7 @@ export default function AddPage() {
   const ledger = useLedger((s) => s.ledger);
   const addExpense = useLedger((s) => s.addExpense);
   const setSalary = useLedger((s) => s.setSalary);
+  const saveError = useLedger((s) => s.saveError);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<Status>('idle');
@@ -106,17 +107,27 @@ export default function AddPage() {
     }
   }
 
-  function save() {
-    if (!canSave) return;
-    addExpense({
-      date,
-      category,
-      shop: shop.trim(),
-      amountPaisa: parsePaisa(amount.trim()),
-      source: read ? 'receipt' : 'manual',
-      confidence: read?.confidence,
-    });
-    router.push('/');
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    if (!canSave || saving) return;
+    setSaving(true);
+    try {
+      // Only navigate once the row is actually in the database. Pushing first
+      // would show a dashboard that does not include the expense just added.
+      await addExpense({
+        date,
+        category,
+        shop: shop.trim(),
+        amountPaisa: parsePaisa(amount.trim()),
+        source: read ? 'receipt' : 'manual',
+        confidence: read?.confidence,
+      });
+      router.push('/');
+      router.refresh();
+    } catch {
+      setSaving(false);
+    }
   }
 
   return (
@@ -286,9 +297,23 @@ export default function AddPage() {
           </Field>
         </div>
 
-        <button type="button" className="btn btn-primary mt-4 w-full" onClick={save} disabled={!canSave}>
-          {canSave ? `Save ${fmt(parsePaisa(amount.trim()), { paisa: false })}` : 'Fill in amount, date and shop'}
+        <button
+          type="button"
+          className="btn btn-primary mt-4 w-full"
+          onClick={save}
+          disabled={!canSave || saving}
+        >
+          {saving
+            ? 'Saving…'
+            : canSave
+              ? `Save ${fmt(parsePaisa(amount.trim()), { paisa: false })}`
+              : 'Fill in amount, date and shop'}
         </button>
+        {saveError && (
+          <p className="mt-2 text-center text-[13px]" style={{ color: 'var(--c-risk)' }}>
+            {saveError}
+          </p>
+        )}
         <p className="mt-2 text-center text-[12px] text-ink3">
           Nothing is saved until you press save.
         </p>

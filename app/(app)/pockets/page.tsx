@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForecast, useLedger, usePockets } from '../../lib/store';
-import { fmt, parsePaisa } from '../../lib/money';
-import { monthLabel } from '../../lib/dates';
-import { Card, Chip, EmptyState, SectionTitle } from '../../components/ui';
+import { useForecast, useLedger, usePockets } from '../../../lib/store';
+import { fmt, parsePaisa } from '../../../lib/money';
+import { monthLabel } from '../../../lib/dates';
+import { Card, Chip, EmptyState, SectionTitle } from '../../../components/ui';
 
 /** Bullet 4 — pockets, completion dates from the forecast, and the DPS comparison. */
 export default function PocketsPage() {

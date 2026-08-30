@@ -1,9 +1,9 @@
 'use client';
 
-import { useLedger, useSummary } from '../lib/store';
-import { fmt, pctOf } from '../lib/money';
-import { dateLabel, monthLabel, monthLabelShort } from '../lib/dates';
-import { Card, Chip, Donut, EmptyState, Meter, SectionTitle, Stat, donutColor } from '../components/ui';
+import { useLedger, useSummary } from '../../lib/store';
+import { fmt, pctOf } from '../../lib/money';
+import { dateLabel, monthLabel, monthLabelShort } from '../../lib/dates';
+import { Card, Chip, Donut, EmptyState, Meter, SectionTitle, Stat, donutColor } from '../../components/ui';
 
 /** Bullet 2 — the monthly dashboard. */
 export default function DashboardPage() {
