@@ -23,7 +23,7 @@ Open the live URL on a phone or a laptop. No install, no account, no setup.
 
 Set a monthly salary. Add an expense by form, or tap **Photograph a bill** — on a phone that opens the rear camera directly.
 
-The app reads **amount, date and shop** from the image and shows every value it read with a confidence score, **before anything is saved**.
+The app sends the photo to Gemini 2.0 Flash, which returns **amount, date and shop** with a confidence score per field under a strict JSON schema. Every value it read is shown **before anything is saved**.
 
 Uncertainty is never hidden. Any field scoring below **0.75** is rendered **empty and marked "check this"** — the app never fills in an amount it guessed. Save stays disabled until amount, date and shop are present, and every field stays editable. Nothing reaches the store until you press save.
 
@@ -87,7 +87,7 @@ each month:  balance += deposit
 
 ```bash
 npm install
-cp .env.example .env.local     # add ANTHROPIC_API_KEY for live receipt reading
+cp .env.example .env.local     # add GEMINI_API_KEY for live receipt reading
 npm run dev                    # http://localhost:3000
 ```
 
@@ -100,7 +100,7 @@ npm run dev                    # http://localhost:3000
 
 `npm run verify` is the one to run first — it prints a row per case and fails loudly on any arithmetic that does not reconcile.
 
-Deployed with `vercel --prod`; `ANTHROPIC_API_KEY` is set as a Vercel environment variable.
+Deployed with `vercel --prod`; `GEMINI_API_KEY` is set as a Vercel environment variable.
 
 ---
 
@@ -129,7 +129,9 @@ scripts/verify.ts     25-case invariant harness
 
 ## Stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · `@anthropic-ai/sdk` (`claude-sonnet-5`, receipt vision) · Zustand · deployed on Vercel.
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Zustand · Gemini 2.0 Flash for receipt vision · deployed on Vercel.
+
+Four production dependencies. Gemini is called over its REST endpoint with `fetch` rather than through a client library: one less dependency, no SDK version drift, and the whole request contract sits in one readable file.
 
 No chart library and no date library: the donut and bars are hand-drawn SVG and CSS, and `lib/dates.ts` is a few dozen lines. Both were dropped deliberately — fewer dependencies, no hydration surprises, and a shorter `LICENSES.md`.
 
@@ -143,7 +145,8 @@ Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 
 ## Mocks and known limits
 
-- **Receipt reading falls back to a mock.** With no `ANTHROPIC_API_KEY`, `/api/extract` returns a clearly labelled mock result with every confidence at or near zero, and the UI shows a "Mock reader" banner. The review-and-correct flow is identical either way. This is the only mocked behaviour in the app.
+- **Receipt reading falls back to a mock.** With no `GEMINI_API_KEY`, `/api/extract` returns a clearly labelled mock result with every confidence at zero, and the UI shows a "Mock reader" banner. The review-and-correct flow is identical either way. This is the only mocked behaviour in the app.
+- **The model's confidence is not taken on trust.** Any field returned as null is scored 0 server-side regardless of what the model claimed, because the client relies on confidence alone to decide what to leave blank.
 - The forecast uses a flat daily rate for variable spending. It does not model weekday and weekend differences, or salary-day effects.
 - Pocket funding priority is list order. There is no drag-to-reorder.
 - Recurring detection matches on exact category and shop. A shop that changes its printed name between months reads as two separate merchants.

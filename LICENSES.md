@@ -12,7 +12,8 @@ Generated from `npx license-checker --production` and reconciled by hand. The ru
 | react | 19.x | MIT | UI rendering |
 | react-dom | 19.x | MIT | DOM renderer |
 | zustand | 5.x | MIT | Client state, persisted to localStorage |
-| @anthropic-ai/sdk | 0.65.x | MIT | Reading amount, date and shop from a bill photo |
+
+Four production dependencies. Receipt reading calls the Gemini REST endpoint with the platform `fetch`, so it adds no package.
 
 ## Direct development dependencies
 
@@ -32,12 +33,14 @@ Pulled in by the packages above. Licence totals for the production tree:
 
 | Licence | Count |
 |---|---|
-| MIT | 18 |
-| Apache-2.0 | 3 |
+| MIT | 14 |
+| Apache-2.0 | 2 |
 | ISC | 2 |
 | BSD-3-Clause | 1 |
 | 0BSD | 1 |
 | CC-BY-4.0 | 1 |
+
+Counts are indicative; regenerate before submitting with the command below.
 
 `caniuse-lite` is the CC-BY-4.0 entry: a browser-support **data set** used by the build toolchain, attribution-only and commercially usable. It ships no code into the application.
 
@@ -58,7 +61,7 @@ npx license-checker --production --summary
 | Service | Terms | Used for |
 |---|---|---|
 | Vercel | Commercial hosting, free tier | Deployment and the live URL |
-| Anthropic API — `claude-sonnet-5` | Anthropic Commercial Terms of Service | Reading amount, date and shop from bill photos |
+| Google Gemini API — `gemini-2.0-flash` | Google APIs Terms of Service / Gemini API Additional Terms | Reading amount, date and shop from bill photos |
 
 ## Fonts, icons and assets
 
@@ -80,7 +83,7 @@ No stock photography, illustration, audio or icon set is used.
 
 ## AI tool use
 
-Claude was used as a coding assistant during the build window, as permitted by the rulebook. All source code in this repository was written during the event; no pre-written solution code for this problem existed beforehand. The repository history is preserved, and `Event.md` records the repository state at the start of the event.
+Claude was used as a coding assistant during the build window, as permitted by the rulebook. Gemini 2.0 Flash is used at runtime by the application itself to read receipt photos. All source code in this repository was written during the event; no pre-written solution code for this problem existed beforehand. The repository history is preserved, and `Event.md` records the repository state at the start of the event.
 
 ## Our own code
 
