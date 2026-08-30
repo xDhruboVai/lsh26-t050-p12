@@ -112,7 +112,7 @@ function PocketCard({
 
       {/* The answer */}
       <div
-        className="mt-3 rounded-lg p-3"
+        className="mt-3 rounded-xl p-3.5"
         style={{ background: plan.reachable ? 'var(--c-accent-soft)' : 'var(--c-warn-soft)' }}
       >
         {plan.reachable ? (
@@ -190,7 +190,7 @@ function PocketCard({
           </button>
 
           {open && (
-            <div className="mt-2 max-h-64 overflow-auto rounded-lg" style={{ background: 'var(--c-surface2)' }}>
+            <div className="well mt-2 max-h-64 overflow-auto p-1">
               <table className="num w-full text-[12px]">
                 <thead>
                   <tr className="text-ink3">

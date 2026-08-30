@@ -225,8 +225,7 @@ export default function AddPage() {
               <img
                 src={preview}
                 alt="The bill you photographed"
-                className="mt-3 max-h-48 w-full rounded-lg object-contain"
-                style={{ background: 'var(--c-surface2)' }}
+                className="well mt-3 max-h-48 w-full rounded-xl object-contain p-2"
               />
             )}
           </div>
@@ -322,8 +321,8 @@ function ReadRow({ label, value, score }: { label: string; value: string | null;
   const sure = score >= SURE_ENOUGH;
   return (
     <div
-      className="flex items-center justify-between gap-3 rounded-lg px-3 py-2"
-      style={{ background: sure ? 'var(--c-surface2)' : 'var(--c-warn-soft)' }}
+      className={`flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 ${sure ? 'well' : ''}`}
+      style={sure ? undefined : { background: 'var(--c-warn-soft)' }}
     >
       <span className="text-[13px] text-ink2">{label}</span>
       <span className="flex items-center gap-2">

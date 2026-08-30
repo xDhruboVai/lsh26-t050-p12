@@ -137,7 +137,25 @@ No chart library and no date library: the donut and bars are hand-drawn SVG and 
 
 Typefaces are Instrument Sans and IBM Plex Mono, downloaded and self-hosted at build time by `next/font`, so there is no runtime request and nothing to fail offline. Every money figure uses the mono face for tabular figures, so digits line up in columns.
 
-Colour is a deep teal (`#017d66`) doing the structural work with a single acid-lime spark (`#ecff68`) reserved for fills — the spend meter and the primary action. The lime is never used as text: it scores 1.10 against white. Every text/background pair in both themes was checked and passes WCAG AA.
+### Look and feel
+
+The interface is neumorphic: surfaces are the same colour as the page and are separated by two opposed shadows rather than borders, so cards read as extruded and inputs as pressed into the page.
+
+Neumorphism has a deserved accessibility reputation, because taken literally it flattens contrast until nothing is readable or obviously clickable. Two rules keep it honest here:
+
+1. **The softness is in the surfaces only.** WCAG measures text against the surface it sits on, not surface against page. Every text pair in both themes was computed and passes AA — the weakest is 4.94.
+2. **Primary actions keep a flat, saturated fill.** A fully neumorphic button is this style's worst failure mode. The lime CTA carries 16.62 against its own ink and never depends on shadow to look pressable.
+
+The palette gives each colour one job:
+
+| Colour | Role |
+|---|---|
+| `#ecff68` acid lime | Primary action, spend meter. A fill only — it scores 1.10 against white and can never be text in light mode |
+| `#cdf128` deep lime | The same action, pressed |
+| `#016653` / `#35c4a1` teal | Structural accent, positive figures, active navigation |
+| `#1e45fc` / `#6d8cff` blue | Focus ring only, so keyboard focus is never confused with an accent |
+
+Grounds are an off-white `#e9eae4` and a near-black `#1b201a` — never pure white or pure black, which kill the shadow on one side and collapse the effect.
 
 Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 

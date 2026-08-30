@@ -30,7 +30,7 @@ export default function CaseBar() {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-rule bg-ground/95 backdrop-blur">
+    <header className="chrome sticky top-0 z-20" style={{ boxShadow: '0 6px 16px -10px var(--nm-dark)' }}>
       <div className="flex items-center gap-2 px-4 py-2.5">
         <div className="min-w-0 flex-1">
           <p className="label">Case</p>
@@ -70,7 +70,7 @@ export default function CaseBar() {
       </div>
 
       {open && (
-        <div className="border-t border-rule px-4 py-3">
+        <div className="px-4 pb-3">
           <label className="label mb-1.5 block" htmlFor="case-json">
             Paste a case JSON
           </label>

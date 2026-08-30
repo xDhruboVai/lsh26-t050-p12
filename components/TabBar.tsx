@@ -16,8 +16,11 @@ export default function TabBar() {
   return (
     <nav
       aria-label="Sections"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-surface/95 backdrop-blur"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="chrome fixed inset-x-0 bottom-0 z-20"
+      style={{
+        boxShadow: '0 -6px 16px -8px var(--nm-dark)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
     >
       <ul className="mx-auto flex w-full max-w-2xl">
         {TABS.map((tab) => {

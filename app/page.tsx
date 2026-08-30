@@ -77,12 +77,14 @@ export default function DashboardPage() {
                   <span className="text-ink2">{monthLabelShort(row.key)}</span>
                   <span className="num text-ink2">{fmt(row.value, { paisa: false })}</span>
                 </div>
-                <div className="h-2.5 overflow-hidden rounded" style={{ background: 'var(--c-surface2)' }}>
+                <div className="track h-2.5 overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded"
+                    className="h-full rounded-full"
                     style={{
                       width: `${Math.round((row.value / barMax) * 100)}%`,
-                      background: row.accent ? 'var(--c-accent)' : 'var(--c-ink3)',
+                      background: row.accent
+                        ? 'var(--c-spark)'
+                        : 'color-mix(in srgb, var(--c-ink3) 42%, var(--c-surface))',
                     }}
                   />
                 </div>
@@ -118,9 +120,9 @@ export default function DashboardPage() {
                       {fmt(c.paisa, { paisa: false })}
                     </span>
                   </div>
-                  <div className="mt-0.5 h-1 overflow-hidden rounded" style={{ background: 'var(--c-surface2)' }}>
+                  <div className="track mt-1 h-1.5 overflow-hidden rounded-full">
                     <div
-                      className="h-full rounded"
+                      className="h-full rounded-full"
                       style={{ width: `${maxCat > 0 ? Math.round((c.paisa / maxCat) * 100) : 0}%`, background: donutColor(i) }}
                     />
                   </div>

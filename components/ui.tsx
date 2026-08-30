@@ -25,8 +25,7 @@ export function Meter({ value, max }: { value: number; max: number }) {
   const over = value > max;
   return (
     <div
-      className="h-2 w-full overflow-hidden rounded-full"
-      style={{ background: 'var(--c-surface2)' }}
+      className="track h-2.5 w-full overflow-hidden rounded-full"
       role="img"
       aria-label={`${pct}% of salary`}
     >

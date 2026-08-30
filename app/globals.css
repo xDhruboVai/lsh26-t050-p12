@@ -1,45 +1,75 @@
 @import "tailwindcss";
 
 /*
- * Typefaces come from next/font in app/layout.tsx, which downloads and
- * self-hosts them at build time. Vercel builds run on their network, not the
- * venue's, so there is no request at runtime and nothing to fail offline.
+ * Neumorphic surfaces, accessible text.
+ *
+ * Soft UI works by making an element the SAME colour as its background and
+ * letting two opposed shadows do the separating. Taken literally that also
+ * flattens text contrast, which is why the style has a bad accessibility
+ * reputation. So the softness lives in the surfaces only: every text pair here
+ * is checked against WCAG AA, and primary actions keep a flat high-contrast
+ * lime fill so a button still reads as pressable without relying on shadow.
+ *
+ * Typefaces come from next/font in app/layout.tsx.
  */
 :root {
-  --c-ground: #f5f4ef;
-  --c-surface: #ffffff;
-  --c-surface2: #ecebe3;
+  /* Surface and ground are the same value on purpose. That is the whole trick. */
+  --c-ground: #e9eae4;
+  --c-surface: #e9eae4;
+  --c-surface2: #e1e2db;
+
+  --nm-dark: #c3c5bd;
+  --nm-light: #fdfffa;
+
   --c-ink: #14180f;
-  --c-ink2: #545a4d;
-  --c-ink3: #66716a;
-  --c-rule: #dedbd1;
-  --c-accent: #017d66;
-  --c-accent-soft: #d8f0e7;
-  --c-spark: #ecff68;
+  --c-ink2: #4d5347;
+  --c-ink3: #5e6657;
+  --c-rule: #d3d5cc;
+
+  --c-accent: #016653;      /* text-safe teal: 5.73 on this ground */
+  --c-accent-fill: #017d66; /* the brighter teal, for fills only */
+  --c-accent-soft: #d5e8e0;
+
+  --c-spark: #ecff68;       /* primary action, spend meter */
+  --c-spark-deep: #cdf128;  /* the same action, pressed */
   --c-spark-ink: #12160f;
-  --c-warn: #9c6413;
-  --c-warn-soft: #f7ebd8;
-  --c-risk: #a63a52;
-  --c-risk-soft: #f8e4e8;
+
+  --c-focus: #1e45fc;
+
+  --c-warn: #8a5810;
+  --c-warn-soft: #f0e4cd;
+  --c-risk: #9c3149;
+  --c-risk-soft: #f2dde1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --c-ground: #0d1410;
-    --c-surface: #141c16;
-    --c-surface2: #1d2820;
+    --c-ground: #1b201a;
+    --c-surface: #1b201a;
+    --c-surface2: #161a15;
+
+    --nm-dark: #101410;
+    --nm-light: #262d24;
+
     --c-ink: #e9eee7;
-    --c-ink2: #a2ada4;
-    --c-ink3: #8b9a93;
-    --c-rule: #26332b;
+    --c-ink2: #a6b0a7;
+    --c-ink3: #8d9a90;
+    --c-rule: #2a312a;
+
     --c-accent: #35c4a1;
-    --c-accent-soft: #10322a;
+    --c-accent-fill: #35c4a1;
+    --c-accent-soft: #16332b;
+
     --c-spark: #ecff68;
+    --c-spark-deep: #cdf128;
     --c-spark-ink: #12160f;
+
+    --c-focus: #6d8cff;
+
     --c-warn: #d9a055;
-    --c-warn-soft: #31250f;
+    --c-warn-soft: #2f2411;
     --c-risk: #e0788c;
-    --c-risk-soft: #33191f;
+    --c-risk-soft: #31191e;
   }
 }
 
@@ -91,16 +121,99 @@ body {
   color: var(--c-ink3);
 }
 
+/* ---------------------------------------------------------------- *
+ * Neumorphic primitives.
+ * raised = lifted out of the page. sunken = pressed into it.
+ * ---------------------------------------------------------------- */
+
 .card {
   background: var(--c-surface);
-  border: 1px solid var(--c-rule);
-  border-radius: 12px;
+  border-radius: 18px;
+  box-shadow:
+    5px 5px 12px var(--nm-dark),
+    -5px -5px 12px var(--nm-light);
 }
 
-/* One card per page carries the answer. It gets the weight; the rest recede. */
+/* One card per page carries the answer. It sits higher than the rest. */
 .card-lead {
-  border-color: color-mix(in srgb, var(--c-accent) 32%, var(--c-rule));
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.16);
+  box-shadow:
+    9px 9px 22px var(--nm-dark),
+    -9px -9px 22px var(--nm-light);
+}
+
+/* A well inside a card: schedules, extracted-field rows, meter tracks. */
+.well {
+  background: var(--c-surface);
+  border-radius: 14px;
+  box-shadow:
+    inset 3px 3px 7px var(--nm-dark),
+    inset -3px -3px 7px var(--nm-light);
+}
+
+.field {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--c-ink);
+  font-size: 16px; /* 16px stops iOS zooming the viewport on focus */
+  background: var(--c-surface);
+  box-shadow:
+    inset 3px 3px 7px var(--nm-dark),
+    inset -3px -3px 7px var(--nm-light);
+}
+.field::placeholder {
+  color: var(--c-ink3);
+}
+.field:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+
+.btn {
+  border: none;
+  border-radius: 14px;
+  min-height: 44px;
+  padding: 12px 18px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--c-ink);
+  background: var(--c-surface);
+  box-shadow:
+    5px 5px 12px var(--nm-dark),
+    -5px -5px 12px var(--nm-light);
+  transition: box-shadow 0.14s ease;
+}
+.btn:active:not(:disabled) {
+  box-shadow:
+    inset 3px 3px 7px var(--nm-dark),
+    inset -3px -3px 7px var(--nm-light);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: var(--c-surface2);
+}
+
+/*
+ * The primary action keeps a flat, saturated fill. A purely neumorphic button
+ * is this style's worst failure mode: nothing on the page looks clickable.
+ * The lime carries 16.62 against its own ink, so this stays unmistakable.
+ */
+.btn-primary {
+  background: var(--c-spark);
+  color: var(--c-spark-ink);
+}
+.btn-primary:active:not(:disabled) {
+  background: var(--c-spark-deep);
+  box-shadow:
+    inset 2px 2px 6px rgb(0 0 0 / 0.3),
+    inset -2px -2px 6px rgb(255 255 255 / 0.2);
+}
+
+.btn-ghost {
+  background: var(--c-surface);
 }
 
 /* Tap-safe inline control, for text buttons that are not .btn */
@@ -110,48 +223,10 @@ body {
   align-items: center;
 }
 
-.field {
-  width: 100%;
-  background: var(--c-surface);
-  border: 1px solid var(--c-rule);
-  border-radius: 9px;
-  padding: 11px 13px;
-  color: var(--c-ink);
-  font-size: 16px; /* 16px stops iOS zooming the viewport on focus */
-}
-.field:focus-visible {
-  outline: 2px solid var(--c-accent);
-  outline-offset: 1px;
-}
-.field::placeholder {
-  color: var(--c-ink3);
-}
-
-.btn {
-  border-radius: 9px;
-  min-height: 44px;
-  padding: 12px 16px;
-  font-weight: 600;
-  font-size: 15px;
-  transition: opacity 0.12s ease;
-}
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-.btn-primary {
-  background: var(--c-spark);
-  color: var(--c-spark-ink);
-}
-.btn-ghost {
-  background: var(--c-surface);
-  border: 1px solid var(--c-rule);
-  color: var(--c-ink);
-}
-
 :focus-visible {
-  outline: 2px solid var(--c-accent);
+  outline: 2px solid var(--c-focus);
   outline-offset: 2px;
+  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -161,4 +236,17 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Meter and bar-chart grooves. Same idea as .well at a smaller scale. */
+.track {
+  background: var(--c-surface);
+  box-shadow:
+    inset 2px 2px 5px var(--nm-dark),
+    inset -2px -2px 5px var(--nm-light);
+}
+
+/* Chrome that floats over the page rather than sitting in it. */
+.chrome {
+  background: var(--c-ground);
 }
