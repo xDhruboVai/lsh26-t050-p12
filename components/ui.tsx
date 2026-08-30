@@ -1,0 +1,159 @@
+import type { ReactNode } from 'react';
+
+export function Card({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <section className={`card p-4 ${className}`}>{children}</section>;
+}
+
+export function SectionTitle({ children, hint }: { children: ReactNode; hint?: string }) {
+  return (
+    <div className="mb-2 flex items-baseline justify-between gap-3">
+      <h2 className="label">{children}</h2>
+      {hint && <span className="text-[11px] text-ink3">{hint}</span>}
+    </div>
+  );
+}
+
+/** Spend against salary. The fill turns risk-coloured once spending passes it. */
+export function Meter({ value, max }: { value: number; max: number }) {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  const over = value > max;
+  return (
+    <div
+      className="h-2 w-full overflow-hidden rounded-full"
+      style={{ background: 'var(--c-surface2)' }}
+      role="img"
+      aria-label={`${pct}% of salary`}
+    >
+      <div
+        className="h-full rounded-full"
+        style={{ width: `${pct}%`, background: over ? 'var(--c-risk)' : 'var(--c-accent)' }}
+      />
+    </div>
+  );
+}
+
+export function Chip({
+  children,
+  tone = 'info',
+}: {
+  children: ReactNode;
+  tone?: 'info' | 'warn' | 'good' | 'risk';
+}) {
+  const map = {
+    info: ['var(--c-surface2)', 'var(--c-ink2)'],
+    good: ['var(--c-accent-soft)', 'var(--c-accent)'],
+    warn: ['var(--c-warn-soft)', 'var(--c-warn)'],
+    risk: ['var(--c-risk-soft)', 'var(--c-risk)'],
+  } as const;
+  const [bg, fg] = map[tone];
+  return (
+    <span
+      className="num inline-flex items-center rounded-full px-2 py-0.5 text-[11.5px] font-semibold"
+      style={{ background: bg, color: fg }}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function EmptyState({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="card p-6 text-center">
+      <p className="font-semibold">{title}</p>
+      <p className="mx-auto mt-1 max-w-sm text-[14px] text-ink2">{body}</p>
+    </div>
+  );
+}
+
+/** A single labelled figure. */
+export function Stat({
+  label,
+  value,
+  tone,
+  sub,
+}: {
+  label: string;
+  value: string;
+  tone?: 'accent' | 'risk' | 'warn';
+  sub?: string;
+}) {
+  const color =
+    tone === 'risk' ? 'var(--c-risk)' : tone === 'warn' ? 'var(--c-warn)' : tone === 'accent' ? 'var(--c-accent)' : 'var(--c-ink)';
+  return (
+    <div>
+      <p className="label">{label}</p>
+      <p className="num mt-0.5 text-[19px] font-semibold" style={{ color }}>
+        {value}
+      </p>
+      {sub && <p className="mt-0.5 text-[12px] text-ink3">{sub}</p>}
+    </div>
+  );
+}
+
+const DONUT_COLORS = [
+  '#0e7c5a', '#3f8f7a', '#6fa08c', '#9c6413', '#c08a3e',
+  '#a63a52', '#7a5a8f', '#4a6fa5', '#5f8f4a', '#8b9089',
+];
+
+export function donutColor(i: number) {
+  return DONUT_COLORS[i % DONUT_COLORS.length];
+}
+
+/** Hand-drawn donut. No chart library, no hydration surprises. */
+export function Donut({
+  slices,
+  size = 132,
+}: {
+  slices: { label: string; value: number }[];
+  size?: number;
+}) {
+  const total = slices.reduce((a, s) => a + s.value, 0);
+  const r = size / 2 - 10;
+  const c = 2 * Math.PI * r;
+  let offset = 0;
+
+  if (total <= 0) {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="No spending yet">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--c-surface2)" strokeWidth={16} />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      role="img"
+      aria-label={slices.map((s) => `${s.label} ${Math.round((s.value / total) * 100)}%`).join(', ')}
+    >
+      <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+        {slices.map((s, i) => {
+          const len = (s.value / total) * c;
+          const el = (
+            <circle
+              key={s.label}
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke={donutColor(i)}
+              strokeWidth={16}
+              strokeDasharray={`${len} ${c - len}`}
+              strokeDashoffset={-offset}
+            />
+          );
+          offset += len;
+          return el;
+        })}
+      </g>
+    </svg>
+  );
+}

@@ -1,0 +1,30 @@
+{
+  "name": "lsh26-t050-p12",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "verify": "tsx scripts/verify.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0"
+  },
+  "license": "MIT",
+  "description": "Personal Ledger Manager — LofiStack Hackathon 2026, problem P12"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Ledger — Personal Ledger Manager",
+  "short_name": "Ledger",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f2ed",
+  "theme_color": "#0e7c5a",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
