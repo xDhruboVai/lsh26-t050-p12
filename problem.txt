@@ -1,0 +1,31 @@
+P12
+Tier 02
+7.5
+AI and Automation
+
+Personal Ledger Manager
+Background
+A salaried person in Dhaka knows what comes in every month and has no clear idea where it goes. Bills are on paper. Mobile money receipts are screenshots. The spending review happens on the last day of the month, when it is too late to change anything.
+
+Problem statement
+At the same time, the things they are saving for, a laptop or a deposit or a wedding, are vague intentions with no date attached. They need one place that records spending with as little typing as possible, shows where the money went, says what the rest of the month looks like, and puts a real date on each savings goal.
+
+Expected solution
+
+All four are scored. Three of four on both problems unlocks the early bonus.
+
+Let the user set a monthly salary and add expenses, including by uploading a photo of a bill or receipt. Read the amount, date and shop name from the image, show what was read so the user can check it, and let them correct any field before saving.
+Show a monthly dashboard: total spent against salary, a breakdown by category, the largest expenses, and the change compared to last month.
+Produce a forecast and written insights from the actual numbers: expected spending for the rest of the month, expected money left or short at month end, and at least three insights that name specific categories and amounts rather than giving general advice.
+Let the user create savings pockets for specific items, each with a name, a target amount, item details and a monthly contribution. For each pocket show an expected completion date based on the forecast, and what a DPS at a rate you state would return over that time.
+Bonus features
+Only attempt these if the four required items already work.
+
+Let the user change a pocket's monthly contribution and see every completion date move immediately.
+Mark an expense as recurring automatically once the same shop and similar amount appears two months running.
+Add a what if control that cuts one category by a percentage and shows the effect on every pocket date.
+Constraints
+If the receipt reading is unsure about a field, show that clearly and let the user fix it. Never fill in an amount the app is not sure about.
+The insights must change when the numbers change. Fixed advice will not score.
+Pocket completion dates must come from the forecast, not from target divided by contribution.
+State your DPS rate and how interest is added.
