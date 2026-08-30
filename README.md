@@ -1,6 +1,6 @@
 # Personal Ledger Manager — P12
 
-**Live URL:** _TODO — paste the Vercel URL here_
+**Live URL:** https://hackathon-lofi.vercel.app
 **Demo video:** _TODO — paste the link here_
 
 LofiStack Hackathon 2026 · Problem P12 · Tier 02 · AI and Automation · Team `LSH26-T050`
@@ -13,7 +13,11 @@ A mobile-first web app for a salaried person in Dhaka who knows their income and
 
 Open the live URL on a phone or a laptop. No install, no account, no setup.
 
-**For judges:** the bar at the top loads any of the 25 public cases, and **Paste** accepts a case JSON directly. Dropping a private case in renders all four required items immediately, with no code change.
+**For judges:** the app is behind a login, but you do not need to register. Sign in with
+
+> **demo@ledger.app** · **demo-ledger-2026**
+
+That account already holds two months of spending and two savings pockets, so every one of the four required items is populated the moment you land. Creating your own account works too; a new account starts empty by design.
 
 ---
 
@@ -83,11 +87,25 @@ each month:  balance += deposit
 
 ---
 
+## Accounts and data
+
+Every person has their own ledger behind an email-and-password login.
+
+- **Passwords** are hashed with scrypt (`node:crypto`) using a 16-byte random salt and compared in constant time. bcrypt and argon2 both need a native build, which is a bad thing to discover is broken during an event.
+- **Sessions** are 32 random bytes in an httpOnly, SameSite=Lax cookie (Secure in production). Only the SHA-256 of the token is stored, so a dumped `sessions` table cannot be replayed, and deleting a row revokes that session immediately.
+- **Brute force**: five wrong passwords locks an account for fifteen minutes.
+- **Enumeration**: sign-in returns the same message whether the account exists or the password is wrong.
+- **Scoping**: every query carries `user_id` in its `WHERE` clause, including updates (`WHERE id = $1 AND user_id = $2`), so a guessed row id returns nothing. The client never states who it is; the session is resolved server-side on every call.
+- The Zustand store is created **per request**, not at module scope, so no state is shared between concurrent server renders.
+
+Money is stored as `BIGINT` paisa, for the same reason it is an integer in the app.
+
 ## How to run
 
 ```bash
 npm install
-cp .env.example .env.local     # add GEMINI_API_KEY for live receipt reading
+cp .env.example .env.local     # GEMINI_API_KEY and DATABASE_URL
+npm run db:migrate             # creates the schema and the demo account
 npm run dev                    # http://localhost:3000
 ```
 
@@ -96,18 +114,20 @@ npm run dev                    # http://localhost:3000
 | `npm run dev` | Development server |
 | `npm run build` | Production build |
 | `npm run verify` | Runs all 25 public cases through the three engines and asserts the invariants |
+| `npm run goalcheck` | Checks the running app against the four required items and the four constraints |
+| `npm run db:migrate` | Applies the schema and creates the demo account. Idempotent |
 | `npm run typecheck` | `tsc --noEmit` |
 
-`npm run verify` is the one to run first — it prints a row per case and fails loudly on any arithmetic that does not reconcile.
+`npm run verify` prints a row per case and fails loudly on any arithmetic that does not reconcile. `npm run goalcheck` goes further and drives the live app, including a real receipt through the extract route: 27 checks, all passing.
 
-Deployed with `vercel --prod`; `GEMINI_API_KEY` is set as a Vercel environment variable.
+Deployed with `vercel --prod`. `GEMINI_API_KEY` and `DATABASE_URL` are set as Vercel environment variables.
 
 ---
 
 ## Technical notes
 
 - **All money is integer paisa.** Amounts arrive as decimal strings and the DPS rule specifies rounding half up to the paisa, so no float touches the money path. `lib/money.ts` owns `parsePaisa`, `roundHalfUp` and formatting; `roundHalfUp` is integer-only division.
-- **No database.** State lives in a Zustand store persisted to `localStorage`, seeded from a case. The only server code is the receipt route.
+- **Neon Postgres over HTTP**, one round trip per query and no pool to manage, which is what a serverless deployment wants.
 - **The three engines are pure functions** — `lib/engine/summary.ts`, `forecast.ts`, `pockets.ts`: state in, derived object out, no side effects, no store access. That is why `scripts/verify.ts` can exercise them headlessly, and why every derived value recomputes on render, which is what makes insights and pocket dates move when the numbers move.
 - `pockets.ts` depends on `forecast.ts` by design: the surplus driving completion dates is a forecast output.
 - **Nothing is hardcoded from the fixtures** — not pocket count, expense count, DPS rate, salary, or category set. The bundled `format_note` is truncated and claims one pocket per case while every public case carries three, so every count is read at runtime.
@@ -129,9 +149,9 @@ scripts/verify.ts     25-case invariant harness
 
 ## Stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Zustand · Gemini 2.0 Flash for receipt vision · deployed on Vercel.
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Zustand · Neon Postgres · Gemini 3.6 Flash for receipt vision · deployed on Vercel.
 
-Four production dependencies. Gemini is called over its REST endpoint with `fetch` rather than through a client library: one less dependency, no SDK version drift, and the whole request contract sits in one readable file.
+Five production dependencies. Gemini is called over its REST endpoint with `fetch` rather than through a client library, and authentication is built on `node:crypto` rather than a framework: fewer dependencies, no SDK version drift, and the whole contract sits in files you can read.
 
 No chart library and no date library: the donut and bars are hand-drawn SVG and CSS, and `lib/dates.ts` is a few dozen lines. Both were dropped deliberately — fewer dependencies, no hydration surprises, and a shorter `LICENSES.md`.
 
@@ -164,6 +184,7 @@ Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 ## Mocks and known limits
 
 - **Receipt reading falls back to a mock.** With no `GEMINI_API_KEY`, `/api/extract` returns a clearly labelled mock result with every confidence at zero, and the UI shows a "Mock reader" banner. The review-and-correct flow is identical either way. This is the only mocked behaviour in the app.
+- **Photos are downscaled to 1600px in the browser** before upload, because a full phone photo exceeds the request-body limit on a serverless deployment.
 - **The model's confidence is not taken on trust.** Any field returned as null is scored 0 server-side regardless of what the model claimed, because the client relies on confidence alone to decide what to leave blank.
 - The forecast uses a flat daily rate for variable spending. It does not model weekday and weekend differences, or salary-day effects.
 - Pocket funding priority is list order. There is no drag-to-reorder.
