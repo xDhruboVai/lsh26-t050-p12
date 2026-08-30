@@ -203,6 +203,9 @@ Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 
 ## Team
 
-_TODO — names and roles._
+- Dihan Islam Dhrubo | Backend DevS
+- Sultan Sajed Shahriar | Full Stack Dev
+- Sirajul Muttakin | Full Stack Dev
+- Sheikh Fatin Aman | Full Stack Dev
 
 Built during the LofiStack Hackathon 2026 build window, 30 August 2026. AI coding assistants were used as permitted by the rulebook; see `LICENSES.md`.
