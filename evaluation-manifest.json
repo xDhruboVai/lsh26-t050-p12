@@ -1,0 +1,129 @@
+{
+  "release_version": "2.2",
+  "team_id": "LSH26-T050",
+  "problem_id": "P12",
+  "repository_name": "lsh26-t050-p12",
+  "live_url": "https://hackathon-lofi.vercel.app",
+  "demo_video_url_optional": "https://drive.google.com/file/d/1h9DtsCmhYivsjbyPE9kSvpswb7R5WTGg/view?usp=sharing",
+  "event_start_code": "LSH26-8490-C900",
+  "final_submission_commit_sha": "1f89a58fa4cd74965fd6defafdced2dbefdd6a2c",
+  "repository_created_before_release": false,
+  "pre_event_materials": [
+    {
+      "name": "None",
+      "source_or_original_location": "N/A",
+      "what_was_present_before_6pm": "Repository was empty"
+    }
+  ],
+  "sample_data": {
+    "loads_published_fixture": true,
+    "method": "file upload and seeded on start and typed entry",
+    "reset_instructions": "The 25 published cases ship in data/cases.json and load from the case picker on the pockets screen; a private case JSON can also be pasted in and previewed without touching stored data. Signing in as demo@ledger.app / demo-ledger-2026 gives an account seeded with two months of spending and two pockets. A new account created from /signup starts empty. To reset the database entirely, run 'npm run db:migrate', which is idempotent and recreates the demo account."
+  },
+  "problem_solving_method": "Three pure functions over one state object: summary, forecast and pockets. Every amount is an integer number of paisa, never a float, because the fixtures give decimal strings and the DPS rule specifies rounding half up to the paisa. Because the engines are pure they can be driven headlessly: scripts/verify.ts runs all 25 published cases and asserts that spent + rest === projected exactly in paisa, and scripts/goalcheck.ts drives the running application against the four required items and the four constraints, including a real receipt through the live extraction route. Pockets deliberately depend on forecast, because the surplus that dates them is a forecast output rather than target divided by contribution.",
+  "requirements": {
+    "R1": {
+      "status": "complete",
+      "evidence": "Route /add. app/(app)/add/page.tsx and app/api/extract/route.ts. Salary is set on /add and /profile. Photos are captured with input capture=environment, downscaled to 1600px in the browser, then read by Gemini 3.6 Flash under a strict JSON response schema that returns a confidence per field. Anything below 0.75 renders empty and flagged 'check this'; every field stays editable and nothing is written until the user confirms."
+    },
+    "R2": {
+      "status": "complete",
+      "evidence": "Route /. app/(app)/page.tsx and lib/engine/summary.ts. Total spent against salary with a meter, category breakdown as a donut with ranked bars, the five largest expenses, and the change against last month with the partial period labelled rather than extrapolated."
+    },
+    "R3": {
+      "status": "complete",
+      "evidence": "Route /forecast. app/(app)/forecast/page.tsx and lib/engine/forecast.ts. Expected spending for the rest of the month, expected money left or short at month end, and generated insights that each name a category and an amount. All 25 published cases produce a different set of insights; scripts/goalcheck.ts fails if any two match."
+    },
+    "R4": {
+      "status": "complete",
+      "evidence": "Route /pockets. app/(app)/pockets/page.tsx and lib/engine/pockets.ts. Pockets carry name, item details, target and monthly contribution, and can be created from the same screen. Completion dates derive from the forecast surplus allocated in list order, never from target divided by contribution, and a pocket the forecast cannot fund is reported unreachable with the monthly cut required. The DPS rate and the compounding rule are printed on the same screen."
+    }
+  },
+  "bonus_features": [
+    {
+      "feature": "Change a pocket's monthly contribution and see every completion date move immediately",
+      "status": "complete",
+      "evidence": "The monthly field on each pocket card writes through to the store and every date recomputes on render, because PocketPlan is derived rather than stored. app/(app)/pockets/page.tsx and lib/store.ts."
+    },
+    {
+      "feature": "Mark an expense recurring automatically when the same shop and a similar amount appear two months running",
+      "status": "complete",
+      "evidence": "lib/engine/forecast.ts matches category and shop pairs across the two months and reports them as bills still due or already paid. scripts/goalcheck.ts asserts the detection across the published cases."
+    },
+    {
+      "feature": "A what-if control that cuts one category by a percentage and shows the effect on every pocket date",
+      "status": "complete",
+      "evidence": "WhatIfCard on the pockets screen recomputes the forecast surplus with the reduction applied and re-dates every pocket. app/(app)/pockets/page.tsx."
+    }
+  ],
+  "team_members": [
+    {
+      "registered_name": "Dihan Islam Dhrubo",
+      "github_username": "xDhruboVai",
+      "major_contribution": "FILL IN — repository owner; created the event start record for this repository. State the real split between P10 and P12.",
+      "evidence_paths_or_commits": [
+        "c4d5dce Create Event.md",
+        "48d2180 problem",
+        "d1c3fe6 Update Event.md"
+      ]
+    },
+    {
+      "registered_name": "Sultan Sajed Shahriar",
+      "github_username": "FILL IN",
+      "major_contribution": "Full-stack implementation of the personal ledger: integer-paisa money and calendar-date libraries, the three engines (summary, forecast, pockets), the Gemini receipt extraction route, email and password authentication with Neon-backed per-user data, the neumorphic interface, and the two verification harnesses.",
+      "evidence_paths_or_commits": [
+        "974b289 Build Personal Ledger Manager (P12)",
+        "06fcb6d Switch receipt reading to Gemini",
+        "a1bcf2f Add accounts, sessions and Neon-backed per-user data",
+        "a44904a Fix cross-request store leak; plain-language security card; goal check",
+        "1f89a58 fix: complete P12 scoring requirements",
+        "lib/ (money.ts, dates.ts, types.ts, caseLoader.ts, auth.ts, db.ts, repo.ts, store.ts, engine/)",
+        "app/ (dashboard, add, forecast, pockets, profile, login, signup, api/extract, api/ledger)",
+        "scripts/ (verify.ts, goalcheck.ts, migrate.ts)"
+      ]
+    }
+  ],
+  "major_design_decisions": [
+    "Money is an integer number of paisa end to end, including BIGINT columns in Postgres. The fixtures give decimal strings and the DPS rule specifies rounding half up to the paisa, which a float cannot honour.",
+    "The forecast splits recurring from variable spending: a category and shop pair seen last month but not yet this month is a bill still due at last month's amount, and everything else runs at the observed daily rate. The variable part is one rounded division rather than a rounded daily rate multiplied out, so spent + rest === projected holds exactly in paisa.",
+    "Pocket completion dates come from the forecast surplus, allocated across pockets in list order up to each stated contribution, with a completed pocket releasing its share to the pockets behind it. The first contribution lands on the 1st of the month after today, because this month's salary is already partly spent.",
+    "A pocket the forecast cannot fund is reported as not reachable at current spending, with the monthly reduction required, rather than given a fabricated date. Seven of the 25 published cases land here.",
+    "Insights are generated and ranked from six live candidates rather than written as fixed text, and every insight names a category and an amount. All 25 published cases produce a different set.",
+    "The receipt reader returns a confidence per field. Anything below 0.75 renders empty and flagged rather than pre-filled, and a field the model returns as null is scored zero server-side regardless of the confidence it claimed, because the interface decides what to blank from the confidence alone.",
+    "Bills are read for the grand total actually paid rather than any subtotal, and dates are read as day/month/year, the local convention.",
+    "Calendar dates are handled as YYYY-MM-DD strings, never Date objects, because a local-timezone Date shifts the day across UTC+6 and silently moves expenses between months.",
+    "The application is behind email and password authentication so each ledger is genuinely private, and the login screen offers a pre-seeded demo account so no judge has to register. A real new account starts empty by design.",
+    "Authentication is built on node:crypto rather than a framework: scrypt for passwords, and sessions as opaque random tokens whose SHA-256 alone is stored, so a dumped table cannot be replayed and any session can be revoked.",
+    "Every query is scoped by user_id, updates included, and the client store is created per request rather than at module scope so no state is shared between concurrent server renders.",
+    "Receipt photos are downscaled to 1600px in the browser before upload, because a full phone photo exceeds the serverless request-body limit.",
+    "Five production dependencies. Gemini is called over REST with fetch rather than through a client library, and the charts are hand-drawn SVG and CSS rather than a chart library.",
+    "Every text and background pair in both themes was computed against WCAG AA rather than judged by eye; the weakest is 4.94."
+  ],
+  "known_limitations": [
+    "No password reset and no email verification; an email address is only an identifier here.",
+    "The forecast uses a flat daily rate for variable spending and does not model weekday and weekend differences or salary-day effects.",
+    "Pocket funding priority is list order, with no reordering in the interface.",
+    "Recurring detection matches on exact category and shop, so a merchant that changes its printed name between months reads as two merchants.",
+    "Published cases carry two months, so the month-over-month comparison has exactly one prior month to work from.",
+    "Without GEMINI_API_KEY the extraction route returns a clearly labelled mock result and the interface says so. This is the only mocked behaviour in the application."
+  ],
+  "ai_tools_used": [
+    {
+      "tool": "Claude (Claude Code)",
+      "used_for": "Implementation across the project: the money and calendar-date libraries, the three engines, the receipt extraction route, authentication and the Neon data layer, the interface, and the two verification harnesses.",
+      "how_output_was_verified": "scripts/verify.ts asserts arithmetic invariants across all 25 published cases, including that spent + rest === projected exactly in integer paisa. scripts/goalcheck.ts drives the running application against the four required items and the four constraints, including a real receipt whose grand total differs from its subtotal and whose date is written day/month. Latest local run: 33 checks, 0 failures. WCAG contrast was computed for every text and background pair rather than judged by eye."
+    },
+    {
+      "tool": "ChatGPT (Codex)",
+      "used_for": "FILL IN — state which parts of the project this was used on.",
+      "how_output_was_verified": "FILL IN — state how that output was checked."
+    },
+    {
+      "tool": "Google Gemini 3.6 Flash",
+      "used_for": "Runtime feature rather than a coding tool: reading the amount, date and shop name from a photographed bill.",
+      "how_output_was_verified": "Output is constrained by a JSON response schema and every field carries a confidence. The route scores any null field zero regardless of what the model claimed, and the interface blanks and flags anything below 0.75 so the user confirms every value before it is stored. Verified against a real receipt and against a blank image."
+    }
+  ],
+  "licenses_file": "LICENSES.md",
+  "declaration": "The information above is complete and truthful to the best of the team's knowledge."
+}
