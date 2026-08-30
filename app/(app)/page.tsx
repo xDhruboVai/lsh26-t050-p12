@@ -15,6 +15,29 @@ export default function DashboardPage() {
   const maxCat = top[0]?.paisa ?? 0;
   const barMax = Math.max(s.totalPaisa, s.lastMonthTotalPaisa, 1);
 
+  if (ledger.expenses.length === 0) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-tight">{monthLabel(s.month)}</h1>
+          <p className="text-[13px] text-ink2">Your ledger is empty. Let us fix that.</p>
+        </div>
+        <EmptyState
+          title="Nothing recorded yet"
+          body="Add your first expense and this month fills in. Photograph a bill and it reads the amount, date and shop for you."
+          action={{ href: '/add', label: 'Add an expense' }}
+        />
+        {s.salaryPaisa === 0 && (
+          <EmptyState
+            title="No salary set"
+            body="The forecast and every pocket date are worked out from your monthly salary, so set it before anything else."
+            action={{ href: '/profile', label: 'Set your salary' }}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -163,8 +186,9 @@ export default function DashboardPage() {
 
       {ledger.expenses.length === 0 && (
         <EmptyState
-          title="No data loaded"
-          body="Pick a case from the bar above, paste a case JSON, or add your first expense."
+          title="Nothing recorded yet"
+          body="Add your first expense and this month fills in. Photograph a bill and it reads the amount, date and shop for you."
+          action={{ href: '/add', label: 'Add an expense' }}
         />
       )}
     </div>

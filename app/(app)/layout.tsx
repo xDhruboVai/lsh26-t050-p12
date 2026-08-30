@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <LedgerProvider initial={ledger}>
       <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col">
-        <TopBar name={user.displayName || user.email} />
+        <TopBar />
         <main className="flex-1 px-4 pb-28 pt-4">{children}</main>
         <TabBar />
       </div>

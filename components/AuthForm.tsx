@@ -1,8 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import type { FormState } from '../app/actions/auth';
+
+/** Mirrors passwordProblem() on the server, so the rules are visible while typing. */
+const RULES = [
+  { test: (p: string) => p.length >= 10, label: 'At least 10 characters' },
+  { test: (p: string) => /[a-z]/i.test(p), label: 'One letter' },
+  { test: (p: string) => /\d/.test(p), label: 'One number' },
+];
 
 export default function AuthForm({
   mode,
@@ -15,6 +22,12 @@ export default function AuthForm({
 }) {
   const [state, formAction, pending] = useActionState(action, {} as FormState);
   const isSignUp = mode === 'signup';
+
+  const [password, setPassword] = useState('');
+  const unmet = RULES.filter((r) => !r.test(password));
+  const passwordReady = password.length > 0 && unmet.length === 0;
+
+  const kept = state.values ?? {};
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5 py-10">
@@ -40,7 +53,13 @@ export default function AuthForm({
         {isSignUp && (
           <label className="block">
             <span className="label mb-1.5 block">Your name</span>
-            <input name="name" className="field" autoComplete="name" placeholder="Rafi" />
+            <input
+              name="name"
+              className="field"
+              autoComplete="name"
+              placeholder="Rafi"
+              defaultValue={kept.name ?? ''}
+            />
           </label>
         )}
 
@@ -54,8 +73,14 @@ export default function AuthForm({
             autoComplete="email"
             inputMode="email"
             placeholder="you@example.com"
+            defaultValue={kept.email ?? ''}
             aria-invalid={state.field === 'email' || undefined}
           />
+          {state.field === 'email' && state.error && (
+            <span className="mt-1.5 block text-[13px]" style={{ color: 'var(--c-risk)' }}>
+              {state.error}
+            </span>
+          )}
         </label>
 
         <label className="block">
@@ -66,12 +91,34 @@ export default function AuthForm({
             required
             className="field"
             autoComplete={isSignUp ? 'new-password' : 'current-password'}
-            placeholder={isSignUp ? 'At least 10 characters' : ''}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             aria-invalid={state.field === 'password' || undefined}
           />
+
           {isSignUp && (
-            <span className="mt-1.5 block text-[12px] text-ink3">
-              At least 10 characters, with a letter and a number.
+            <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+              {RULES.map((rule) => {
+                const met = rule.test(password);
+                return (
+                  <li
+                    key={rule.label}
+                    className="flex items-center gap-1.5 text-[12px]"
+                    style={{ color: met ? 'var(--c-accent)' : 'var(--c-ink3)' }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      {met ? <path d="M4 12.5l5.5 5.5L20 7" /> : <circle cx="12" cy="12" r="8" />}
+                    </svg>
+                    {rule.label}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {state.field === 'password' && state.error && (
+            <span className="mt-1.5 block text-[13px]" style={{ color: 'var(--c-risk)' }}>
+              {state.error}
             </span>
           )}
         </label>
@@ -84,6 +131,7 @@ export default function AuthForm({
               className="field num"
               inputMode="numeric"
               placeholder="50000"
+              defaultValue={kept.salary ?? ''}
             />
             <span className="mt-1.5 block text-[12px] text-ink3">
               You can change this any time in your profile.
@@ -91,7 +139,8 @@ export default function AuthForm({
           </label>
         )}
 
-        {state.error && (
+        {/* Anything not already shown beside the field it belongs to. */}
+        {state.error && state.field !== 'email' && state.field !== 'password' && (
           <p
             role="alert"
             className="rounded-xl px-3.5 py-2.5 text-[13.5px]"
@@ -101,7 +150,11 @@ export default function AuthForm({
           </p>
         )}
 
-        <button type="submit" className="btn btn-primary w-full" disabled={pending}>
+        <button
+          type="submit"
+          className="btn btn-primary w-full"
+          disabled={pending || (isSignUp && !passwordReady)}
+        >
           {pending
             ? isSignUp
               ? 'Creating your ledger…'
@@ -125,7 +178,11 @@ export default function AuthForm({
 
       <p className="mt-5 text-center text-[14px] text-ink2">
         {isSignUp ? 'Already have an account? ' : 'No account yet? '}
-        <Link href={isSignUp ? '/login' : '/signup'} className="font-semibold" style={{ color: 'var(--c-accent)' }}>
+        <Link
+          href={isSignUp ? '/login' : '/signup'}
+          className="font-semibold"
+          style={{ color: 'var(--c-accent)' }}
+        >
           {isSignUp ? 'Sign in' : 'Create one'}
         </Link>
       </p>

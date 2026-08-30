@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 export function Card({
@@ -61,11 +62,25 @@ export function Chip({
   );
 }
 
-export function EmptyState({ title, body }: { title: string; body: string }) {
+export function EmptyState({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  /** An empty state without a way out is just a dead end. */
+  action?: { href: string; label: string };
+}) {
   return (
     <div className="card p-6 text-center">
       <p className="font-semibold">{title}</p>
       <p className="mx-auto mt-1 max-w-sm text-[14px] text-ink2">{body}</p>
+      {action && (
+        <Link href={action.href} className="btn btn-primary mt-4 inline-flex items-center justify-center">
+          {action.label}
+        </Link>
+      )}
     </div>
   );
 }

@@ -148,9 +148,11 @@ export async function deletePocket(userId: string, id: string): Promise<void> {
 }
 
 /**
- * A brand-new account is empty, and an empty ledger cannot demonstrate a
- * forecast or a pocket date. Seeding two months of plausible spending on
- * signup means the first screen a new user sees is the actual product.
+ * Seeds the DEMO account only, from the migration.
+ *
+ * Real signups start empty: showing someone spending they never entered is
+ * worse than an empty state. The demo account exists precisely so a judge can
+ * see a populated ledger without registering.
  */
 export async function seedNewAccount(userId: string, salaryPaisa: number): Promise<void> {
   const today = new Date();

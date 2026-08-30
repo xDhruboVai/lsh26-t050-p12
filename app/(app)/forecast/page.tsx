@@ -17,7 +17,8 @@ export default function ForecastPage() {
     return (
       <EmptyState
         title="Nothing to forecast yet"
-        body="A forecast needs at least a few days of spending. Add expenses or load a case."
+        body="A forecast needs a few days of spending to work from. Add an expense and this fills in."
+        action={{ href: '/add', label: 'Add an expense' }}
       />
     );
   }
