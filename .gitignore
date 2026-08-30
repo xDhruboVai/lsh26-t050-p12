@@ -1,9 +1,12 @@
 node_modules
 .next
 out
-.env*.local
 .vercel
 *.tsbuildinfo
 next-env.d.ts
 .claude
-.env
+
+# Secrets. Ignore every env file, then allow back only the empty template.
+# `.env*.local` alone does not match a plain `.env`.
+.env*
+!.env.example
