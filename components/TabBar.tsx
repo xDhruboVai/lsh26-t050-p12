@@ -3,11 +3,23 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+/**
+ * Bottom navigation. Each icon sits in an extruded tile that presses in when
+ * it is the current section, so the state reads as depth as well as colour.
+ */
 const TABS = [
-  { href: '/', label: 'Month', d: 'M3 10h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z' },
-  { href: '/add', label: 'Add', d: 'M12 5v14M5 12h14' },
-  { href: '/forecast', label: 'Forecast', d: 'M3 17l5-6 4 4 5-7 4 5' },
-  { href: '/pockets', label: 'Pockets', d: 'M4 7h16v12H4zM4 7l2-3h12l2 3M9 12h6' },
+  {
+    href: '/',
+    label: 'Month',
+    d: 'M4 6.5h16M4 6.5a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM8 10.5h3M8 14h6',
+  },
+  { href: '/add', label: 'Add', d: 'M12 6v12M6 12h12' },
+  { href: '/forecast', label: 'Forecast', d: 'M4 16.5l4.5-5 3.5 3 4-6 4 4.5' },
+  {
+    href: '/pockets',
+    label: 'Pockets',
+    d: 'M4 9h16v10H4zM4 9l2-4h12l2 4M9.5 13h5',
+  },
 ];
 
 export default function TabBar() {
@@ -18,11 +30,11 @@ export default function TabBar() {
       aria-label="Sections"
       className="chrome fixed inset-x-0 bottom-0 z-20"
       style={{
-        boxShadow: '0 -6px 16px -8px var(--nm-dark)',
+        boxShadow: '0 -8px 20px -12px var(--nm-dark)',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      <ul className="mx-auto flex w-full max-w-2xl">
+      <ul className="mx-auto flex w-full max-w-2xl px-2 py-2">
         {TABS.map((tab) => {
           const active = path === tab.href;
           return (
@@ -30,23 +42,28 @@ export default function TabBar() {
               <Link
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
-                className="flex flex-col items-center gap-1 py-2.5"
-                style={{ color: active ? 'var(--c-accent)' : 'var(--c-ink3)' }}
+                className="flex flex-col items-center gap-1 py-1"
               >
-                <svg
-                  width="21"
-                  height="21"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={active ? 2.1 : 1.7}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+                <span className={`tile ${active ? 'tile-on' : ''}`} aria-hidden="true">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={active ? 2 : 1.7}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d={tab.d} />
+                  </svg>
+                </span>
+                <span
+                  className="text-[11px] font-semibold tracking-wide"
+                  style={{ color: active ? 'var(--c-accent)' : 'var(--c-ink3)' }}
                 >
-                  <path d={tab.d} />
-                </svg>
-                <span className="text-[11px] font-semibold tracking-wide">{tab.label}</span>
+                  {tab.label}
+                </span>
               </Link>
             </li>
           );

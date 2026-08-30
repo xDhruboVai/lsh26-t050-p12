@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f5f4ef" }, { media: "(prefers-color-scheme: dark)", color: "#0d1410" }],
+  themeColor: '#e9eae4',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -55,7 +55,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${instrument.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${instrument.variable} ${plexMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          // Runs before paint so a saved theme never flashes the other one.
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('ledger-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

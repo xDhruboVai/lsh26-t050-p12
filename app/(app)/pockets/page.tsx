@@ -181,11 +181,26 @@ function PocketCard({
 
           <button
             type="button"
-            className="tap mt-1 text-[12.5px] font-semibold"
+            className="tap mt-1 flex items-center gap-2.5 text-[12.5px] font-semibold"
             style={{ color: 'var(--c-accent)' }}
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
+            <span className={`tile tile-sm ${open ? 'tile-on' : ''}`} aria-hidden="true">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transform: open ? 'rotate(180deg)' : undefined }}
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
             {open ? 'Hide' : 'Show'} month-by-month schedule
           </button>
 

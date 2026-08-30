@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLedger } from '../lib/store';
 import { monthLabel } from '../lib/dates';
+import ThemeToggle from './ThemeToggle';
 
 export default function TopBar({ name }: { name: string }) {
   const ledger = useLedger((s) => s.ledger);
@@ -19,14 +20,27 @@ export default function TopBar({ name }: { name: string }) {
             {ledger.pockets.length} pockets
           </p>
         </div>
+        <ThemeToggle />
         <Link
           href="/profile"
           aria-label="Your profile"
           aria-current={path === '/profile' ? 'page' : undefined}
-          className="btn btn-ghost flex-none px-3.5"
-          style={{ color: path === '/profile' ? 'var(--c-accent)' : undefined }}
+          className={`tile flex-none ${path === '/profile' ? 'tile-on' : ''}`}
         >
-          Profile
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="8.5" r="3.5" />
+            <path d="M5 19.5a7 7 0 0 1 14 0" />
+          </svg>
         </Link>
       </div>
     </header>

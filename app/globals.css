@@ -42,35 +42,31 @@
   --c-risk-soft: #f2dde1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --c-ground: #1b201a;
-    --c-surface: #1b201a;
-    --c-surface2: #161a15;
 
-    --nm-dark: #101410;
-    --nm-light: #262d24;
-
-    --c-ink: #e9eee7;
-    --c-ink2: #a6b0a7;
-    --c-ink3: #8d9a90;
-    --c-rule: #2a312a;
-
-    --c-accent: #35c4a1;
-    --c-accent-fill: #35c4a1;
-    --c-accent-soft: #16332b;
-
-    --c-spark: #ecff68;
-    --c-spark-deep: #cdf128;
-    --c-spark-ink: #12160f;
-
-    --c-focus: #6d8cff;
-
-    --c-warn: #d9a055;
-    --c-warn-soft: #2f2411;
-    --c-risk: #e0788c;
-    --c-risk-soft: #31191e;
-  }
+/* Dark is opt-in. With no choice stored the app is light, whatever the
+   operating system prefers, so every judge sees the same interface. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-ground: #232323;
+  --c-surface: #232323;
+  --c-surface2: #1e1e1e;
+  --nm-dark: #161616;
+  --nm-light: #313131;
+  --c-ink: #ebebeb;
+  --c-ink2: #adadad;
+  --c-ink3: #949494;
+  --c-rule: #313131;
+  --c-accent: #35c4a1;
+  --c-accent-fill: #35c4a1;
+  --c-accent-soft: #1b2f2a;
+  --c-spark: #ecff68;
+  --c-spark-deep: #cdf128;
+  --c-spark-ink: #12160f;
+  --c-focus: #6d8cff;
+  --c-warn: #d9a055;
+  --c-warn-soft: #2e2617;
+  --c-risk: #e0788c;
+  --c-risk-soft: #2f1d21;
 }
 
 @theme inline {
@@ -93,7 +89,10 @@
   --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Consolas, monospace;
 }
 
+/* One committed look. color-scheme keeps form controls and scrollbars light
+   so a dark-mode browser does not paint its own chrome over the design. */
 html {
+  color-scheme: light;
   background: var(--c-ground);
   -webkit-text-size-adjust: 100%;
 }
@@ -236,6 +235,39 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Icon tiles. An icon on its own has no affordance in soft UI; sitting it in a
+ * small extruded square gives it an edge to catch the light.
+ * Raised by default, pressed in when it is the current thing.
+ */
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: var(--c-surface);
+  color: var(--c-ink3);
+  box-shadow:
+    4px 4px 9px var(--nm-dark),
+    -4px -4px 9px var(--nm-light);
+  transition:
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+}
+.tile-on {
+  color: var(--c-accent);
+  box-shadow:
+    inset 3px 3px 6px var(--nm-dark),
+    inset -3px -3px 6px var(--nm-light);
+}
+.tile-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
 }
 
 /* Meter and bar-chart grooves. Same idea as .well at a smaller scale. */

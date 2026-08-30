@@ -12,6 +12,11 @@ const PUBLIC = ['/login', '/signup', '/api/extract', '/icon.svg', '/opengraph-im
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // API routes authenticate themselves and answer 401 in JSON. Redirecting them
+  // to an HTML login page gives the client something it cannot parse.
+  if (pathname.startsWith('/api/')) return NextResponse.next();
+
   if (PUBLIC.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
     return NextResponse.next();
   }

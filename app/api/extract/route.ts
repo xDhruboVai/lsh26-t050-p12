@@ -18,7 +18,7 @@ export const maxDuration = 30;
  * the review-and-correct flow still demos end to end.
  */
 
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash';
+const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
 const ENDPOINT = (model: string) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
