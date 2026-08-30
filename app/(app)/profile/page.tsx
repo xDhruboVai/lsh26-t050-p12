@@ -1,13 +1,14 @@
-import { redirect } from 'next/navigation';
-import { currentUser } from '../../../lib/auth';
-import { signOut } from '../../actions/auth';
-import ProfileForm from '../../../components/ProfileForm';
+import { redirect } from "next/navigation";
+import { currentUser } from "../../../lib/auth";
+import { signOut } from "../../actions/auth";
+import ProfileForm from "../../../components/ProfileForm";
+import CaseTools from "../../../components/CaseTools";
 
-export const metadata = { title: 'Profile — Ledger' };
+export const metadata = { title: "Profile — Ledger" };
 
 export default async function ProfilePage() {
   const user = await currentUser();
-  if (!user) redirect('/login');
+  if (!user) redirect("/login");
 
   return (
     <div className="flex flex-col gap-4">
@@ -22,6 +23,8 @@ export default async function ProfilePage() {
         salaryPaisa={user.salaryPaisa}
         dpsRatePct={user.dpsRatePct}
       />
+
+      <CaseTools />
 
       <form action={signOut}>
         <button type="submit" className="btn btn-ghost w-full">

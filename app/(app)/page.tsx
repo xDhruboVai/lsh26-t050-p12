@@ -1,9 +1,18 @@
-'use client';
+"use client";
 
-import { useLedger, useSummary } from '../../lib/store';
-import { fmt, pctOf } from '../../lib/money';
-import { dateLabel, monthLabel, monthLabelShort } from '../../lib/dates';
-import { Card, Chip, Donut, EmptyState, Meter, SectionTitle, Stat, donutColor } from '../../components/ui';
+import { useLedger, useSummary } from "../../lib/store";
+import { fmt, pctOf } from "../../lib/money";
+import { dateLabel, monthLabel, monthLabelShort } from "../../lib/dates";
+import {
+  Card,
+  Chip,
+  Donut,
+  EmptyState,
+  Meter,
+  SectionTitle,
+  Stat,
+  donutColor,
+} from "../../components/ui";
 
 /** Bullet 2 — the monthly dashboard. */
 export default function DashboardPage() {
@@ -19,19 +28,23 @@ export default function DashboardPage() {
     return (
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight">{monthLabel(s.month)}</h1>
-          <p className="text-[13px] text-ink2">Your ledger is empty. Let us fix that.</p>
+          <h1 className="text-[22px] font-bold tracking-tight">
+            {monthLabel(s.month)}
+          </h1>
+          <p className="text-[13px] text-ink2">
+            Your ledger is empty. Let us fix that.
+          </p>
         </div>
         <EmptyState
           title="Nothing recorded yet"
           body="Add your first expense and this month fills in. Photograph a bill and it reads the amount, date and shop for you."
-          action={{ href: '/add', label: 'Add an expense' }}
+          action={{ href: "/add", label: "Add an expense" }}
         />
         {s.salaryPaisa === 0 && (
           <EmptyState
             title="No salary set"
             body="The forecast and every pocket date are worked out from your monthly salary, so set it before anything else."
-            action={{ href: '/profile', label: 'Set your salary' }}
+            action={{ href: "/profile", label: "Set your salary" }}
           />
         )}
       </div>
@@ -41,9 +54,12 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-[22px] font-bold tracking-tight">{monthLabel(s.month)}</h1>
+        <h1 className="text-[22px] font-bold tracking-tight">
+          {monthLabel(s.month)}
+        </h1>
         <p className="text-[13px] text-ink2">
-          Month to date, through {dateLabel(ledger.today)}. This month is still running.
+          Month to date, through {dateLabel(ledger.today)}. This month is still
+          running.
         </p>
       </div>
 
@@ -53,7 +69,7 @@ export default function DashboardPage() {
           <Stat
             label="Spent this month"
             value={fmt(s.totalPaisa, { paisa: false })}
-            tone={s.leftPaisa < 0 ? 'risk' : undefined}
+            tone={s.leftPaisa < 0 ? "risk" : undefined}
             sub={`${s.count} expenses`}
             big
           />
@@ -68,9 +84,18 @@ export default function DashboardPage() {
         <div className="mt-3">
           <Meter value={s.totalPaisa} max={s.salaryPaisa} />
           <div className="mt-1.5 flex items-center justify-between">
-            <span className="num text-[12px] text-ink3">{spentPct}% of salary</span>
-            <span className="num text-[12px]" style={{ color: s.leftPaisa < 0 ? 'var(--c-risk)' : 'var(--c-ink3)' }}>
-              {s.leftPaisa < 0 ? `${fmt(-s.leftPaisa, { paisa: false })} over` : `${fmt(s.leftPaisa, { paisa: false })} unspent`}
+            <span className="num text-[12px] text-ink3">
+              {spentPct}% of salary
+            </span>
+            <span
+              className="num text-[12px]"
+              style={{
+                color: s.leftPaisa < 0 ? "var(--c-risk)" : "var(--c-ink3)",
+              }}
+            >
+              {s.leftPaisa < 0
+                ? `${fmt(-s.leftPaisa, { paisa: false })} over`
+                : `${fmt(s.leftPaisa, { paisa: false })} unspent`}
             </span>
           </div>
         </div>
@@ -78,27 +103,40 @@ export default function DashboardPage() {
 
       {/* Against last month */}
       <Card>
-        <SectionTitle hint={`vs ${monthLabelShort(ledger.months.last)}`}>Change on last month</SectionTitle>
+        <SectionTitle hint={`vs ${monthLabelShort(ledger.months.last)}`}>
+          Change on last month
+        </SectionTitle>
         {s.lastMonthTotalPaisa === 0 ? (
-          <p className="text-[14px] text-ink2">No spending recorded for {monthLabel(ledger.months.last)}.</p>
+          <p className="text-[14px] text-ink2">
+            No spending recorded for {monthLabel(ledger.months.last)}.
+          </p>
         ) : (
           <>
             <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
-              <Chip tone={s.deltaPaisa > 0 ? 'risk' : 'good'}>
-                {s.deltaPaisa > 0 ? '+' : ''}
-                {fmt(s.deltaPaisa, { paisa: false }).replace('BDT ', '')} ({s.deltaPct > 0 ? '+' : ''}
+              <Chip tone={s.deltaPaisa > 0 ? "risk" : "good"}>
+                {s.deltaPaisa > 0 ? "+" : ""}
+                {fmt(s.deltaPaisa, { paisa: false }).replace("BDT ", "")} (
+                {s.deltaPct > 0 ? "+" : ""}
                 {s.deltaPct}%)
               </Chip>
-              <span className="text-[12.5px] text-ink3">so far, against the full last month</span>
+              <span className="text-[12.5px] text-ink3">
+                so far, against the full last month
+              </span>
             </div>
             {[
               { key: ledger.months.this, value: s.totalPaisa, accent: true },
-              { key: ledger.months.last, value: s.lastMonthTotalPaisa, accent: false },
+              {
+                key: ledger.months.last,
+                value: s.lastMonthTotalPaisa,
+                accent: false,
+              },
             ].map((row) => (
               <div key={row.key} className="mb-2 last:mb-0">
                 <div className="mb-1 flex justify-between text-[12.5px]">
                   <span className="text-ink2">{monthLabelShort(row.key)}</span>
-                  <span className="num text-ink2">{fmt(row.value, { paisa: false })}</span>
+                  <span className="num text-ink2">
+                    {fmt(row.value, { paisa: false })}
+                  </span>
                 </div>
                 <div className="track h-2.5 overflow-hidden rounded-full">
                   <div
@@ -106,8 +144,8 @@ export default function DashboardPage() {
                     style={{
                       width: `${Math.round((row.value / barMax) * 100)}%`,
                       background: row.accent
-                        ? 'var(--c-spark)'
-                        : 'color-mix(in srgb, var(--c-ink3) 42%, var(--c-surface))',
+                        ? "var(--c-spark)"
+                        : "color-mix(in srgb, var(--c-ink3) 42%, var(--c-surface))",
                     }}
                   />
                 </div>
@@ -119,16 +157,20 @@ export default function DashboardPage() {
 
       {/* Category breakdown */}
       <Card>
-        <SectionTitle hint={`${top.length} categories`}>Where it went</SectionTitle>
+        <SectionTitle hint={`${top.length} categories`}>
+          Where it went
+        </SectionTitle>
         {top.length === 0 ? (
           <p className="text-[14px] text-ink2">
             Nothing recorded this month yet. Add an expense and this fills in.
           </p>
         ) : (
           <div className="flex items-center gap-4">
-            <Donut slices={top.map((c) => ({ label: c.category, value: c.paisa }))} />
+            <Donut
+              slices={top.map((c) => ({ label: c.category, value: c.paisa }))}
+            />
             <ul className="min-w-0 flex-1">
-              {top.slice(0, 6).map((c, i) => (
+              {top.map((c, i) => (
                 <li key={c.category} className="mb-1.5 last:mb-0">
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="flex min-w-0 items-center gap-1.5 text-[13px]">
@@ -146,7 +188,10 @@ export default function DashboardPage() {
                   <div className="track mt-1 h-1.5 overflow-hidden rounded-full">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${maxCat > 0 ? Math.round((c.paisa / maxCat) * 100) : 0}%`, background: donutColor(i) }}
+                      style={{
+                        width: `${maxCat > 0 ? Math.round((c.paisa / maxCat) * 100) : 0}%`,
+                        background: donutColor(i),
+                      }}
                     />
                   </div>
                 </li>
@@ -172,7 +217,7 @@ export default function DashboardPage() {
                   <p className="truncate text-[14px] font-medium">{e.shop}</p>
                   <p className="text-[12px] text-ink3">
                     {e.category} · {dateLabel(e.date)}
-                    {e.source === 'receipt' && ' · from receipt'}
+                    {e.source === "receipt" && " · from receipt"}
                   </p>
                 </div>
                 <span className="num flex-none text-[14px] font-semibold">
@@ -188,7 +233,7 @@ export default function DashboardPage() {
         <EmptyState
           title="Nothing recorded yet"
           body="Add your first expense and this month fills in. Photograph a bill and it reads the amount, date and shop for you."
-          action={{ href: '/add', label: 'Add an expense' }}
+          action={{ href: "/add", label: "Add an expense" }}
         />
       )}
     </div>

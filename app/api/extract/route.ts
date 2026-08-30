@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * Reads amount, date and shop from a photo of a bill, using Gemini 2.0 Flash.
+ * Reads amount, date and shop from a photo of a bill, using Gemini 3.6 Flash.
  *
  * The contract that matters is the CONFIDENCE, not the values: the problem
  * states that a field the reader is unsure about must be shown as unsure and
@@ -18,13 +18,21 @@ export const maxDuration = 60;
  * the review-and-correct flow still demos end to end.
  */
 
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
 const ENDPOINT = (model: string) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
 const CATEGORIES = [
-  'Rent', 'Groceries', 'Food', 'Transport', 'Utilities',
-  'Mobile', 'Health', 'Education', 'Entertainment', 'Clothing',
+  "Rent",
+  "Groceries",
+  "Food",
+  "Transport",
+  "Utilities",
+  "Mobile",
+  "Health",
+  "Education",
+  "Entertainment",
+  "Clothing",
 ];
 
 /**
@@ -32,67 +40,69 @@ const CATEGORIES = [
  * than a union type, and no `additionalProperties`.
  */
 const RESPONSE_SCHEMA = {
-  type: 'OBJECT',
+  type: "OBJECT",
   properties: {
     amount_bdt: {
-      type: 'STRING',
+      type: "STRING",
       nullable: true,
       description:
         'The grand total actually paid, as a plain decimal string such as "2475.00". No currency symbol, no thousands separators. Null if no total is legible.',
     },
     date: {
-      type: 'STRING',
+      type: "STRING",
       nullable: true,
-      description: 'Transaction date as YYYY-MM-DD. Null if not legible.',
+      description: "Transaction date as YYYY-MM-DD. Null if not legible.",
     },
     shop: {
-      type: 'STRING',
+      type: "STRING",
       nullable: true,
-      description: 'Merchant or shop name as printed. Null if not legible.',
+      description: "Merchant or shop name as printed. Null if not legible.",
     },
     category: {
-      type: 'STRING',
+      type: "STRING",
       nullable: true,
       enum: CATEGORIES,
-      description: 'Best-fitting spending category. Null if genuinely unclear.',
+      description: "Best-fitting spending category. Null if genuinely unclear.",
     },
     confidence: {
-      type: 'OBJECT',
+      type: "OBJECT",
       description:
-        'How certain you are of each field, 0 to 1. Be honest and understate rather than overstate. A field you returned as null must score near 0.',
+        "How certain you are of each field, 0 to 1. Be honest and understate rather than overstate. A field you returned as null must score near 0.",
       properties: {
-        amount: { type: 'NUMBER' },
-        date: { type: 'NUMBER' },
-        shop: { type: 'NUMBER' },
+        amount: { type: "NUMBER" },
+        date: { type: "NUMBER" },
+        shop: { type: "NUMBER" },
       },
-      required: ['amount', 'date', 'shop'],
+      required: ["amount", "date", "shop"],
     },
     notes: {
-      type: 'STRING',
+      type: "STRING",
       nullable: true,
-      description: 'One short sentence about anything unreadable or ambiguous. Null if the image is clean.',
+      description:
+        "One short sentence about anything unreadable or ambiguous. Null if the image is clean.",
     },
   },
-  required: ['amount_bdt', 'date', 'shop', 'category', 'confidence'],
+  required: ["amount_bdt", "date", "shop", "category", "confidence"],
 } as const;
 
 const PROMPT = [
-  'This is a photo of a shop bill, restaurant receipt, or mobile-money confirmation from Bangladesh.',
-  'Read the grand total actually paid, the transaction date, and the merchant name.',
-  'Amounts are in Bangladeshi taka. Ignore any currency symbol and return a plain decimal string.',
-  'Prefer the grand total over any subtotal or individual item line.',
-  'If the image is blurred, cropped, or a field is genuinely unreadable, return null for that field',
-  'and score it low. Never infer or estimate an amount that is not printed on the bill.',
-].join(' ');
+  "This is a photo of a shop bill, restaurant receipt, or mobile-money confirmation from Bangladesh.",
+  "Read the grand total actually paid, the transaction date, and the merchant name.",
+  "Amounts are in Bangladeshi taka. Ignore any currency symbol and return a plain decimal string.",
+  "Prefer the grand total over any subtotal or individual item line.",
+  "If the image is blurred, cropped, or a field is genuinely unreadable, return null for that field",
+  "and score it low. Never infer or estimate an amount that is not printed on the bill.",
+].join(" ");
 
 const MOCK = {
-  mode: 'mock' as const,
+  mode: "mock" as const,
   amount_bdt: null,
   date: null,
   shop: null,
   category: null,
   confidence: { amount: 0, date: 0, shop: 0 },
-  notes: 'Mock reader: GEMINI_API_KEY is not set, so nothing was read from the image.',
+  notes:
+    "Mock reader: GEMINI_API_KEY is not set, so nothing was read from the image.",
 };
 
 interface GeminiResponse {
@@ -109,13 +119,16 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Send a JSON body with an "image" field.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Send a JSON body with an "image" field.' },
+      { status: 400 },
+    );
   }
 
-  const image = body.image ?? '';
+  const image = body.image ?? "";
   if (!image) {
     return NextResponse.json(
-      { error: 'No image received. Pick a photo and try again.' },
+      { error: "No image received. Pick a photo and try again." },
       { status: 400 },
     );
   }
@@ -124,19 +137,19 @@ export async function POST(request: Request) {
   if (!apiKey) return NextResponse.json(MOCK);
 
   // Strip a data: URL prefix if the client sent one, and recover the real type.
-  const commaAt = image.indexOf(',');
+  const commaAt = image.indexOf(",");
   const base64 = commaAt >= 0 ? image.slice(commaAt + 1) : image;
   const declared = /^data:([^;,]+)/.exec(image)?.[1];
-  const mimeType = declared ?? body.mediaType ?? 'image/jpeg';
+  const mimeType = declared ?? body.mediaType ?? "image/jpeg";
 
   try {
     const res = await fetch(ENDPOINT(MODEL), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [
           {
-            role: 'user',
+            role: "user",
             parts: [
               { inline_data: { mime_type: mimeType, data: base64 } },
               { text: PROMPT },
@@ -147,7 +160,7 @@ export async function POST(request: Request) {
           // Reading a printed number is not a creative task.
           temperature: 0,
           maxOutputTokens: 1024,
-          responseMimeType: 'application/json',
+          responseMimeType: "application/json",
           responseSchema: RESPONSE_SCHEMA,
         },
       }),
@@ -159,14 +172,19 @@ export async function POST(request: Request) {
     if (!res.ok) {
       const detail = data.error?.message ?? `${res.status} ${res.statusText}`;
       return NextResponse.json(
-        { error: `The reader refused the request: ${detail}. Enter the fields by hand.` },
+        {
+          error: `The reader refused the request: ${detail}. Enter the fields by hand.`,
+        },
         { status: 502 },
       );
     }
 
     if (data.promptFeedback?.blockReason) {
       return NextResponse.json(
-        { error: 'That image was blocked by the reader. Enter the fields by hand.' },
+        {
+          error:
+            "That image was blocked by the reader. Enter the fields by hand.",
+        },
         { status: 502 },
       );
     }
@@ -175,8 +193,8 @@ export async function POST(request: Request) {
     if (!text) {
       return NextResponse.json({
         ...MOCK,
-        mode: 'live',
-        notes: 'The reader returned nothing usable. Enter the fields by hand.',
+        mode: "live",
+        notes: "The reader returned nothing usable. Enter the fields by hand.",
       });
     }
 
@@ -186,8 +204,9 @@ export async function POST(request: Request) {
     } catch {
       return NextResponse.json({
         ...MOCK,
-        mode: 'live',
-        notes: 'The reader did not return valid JSON. Enter the fields by hand.',
+        mode: "live",
+        notes:
+          "The reader did not return valid JSON. Enter the fields by hand.",
       });
     }
 
@@ -196,31 +215,31 @@ export async function POST(request: Request) {
     // confidence alone to decide what to leave blank.
     const c = (parsed.confidence ?? {}) as Record<string, unknown>;
     const score = (key: string, value: unknown) => {
-      if (value === null || value === undefined || value === '') return 0;
+      if (value === null || value === undefined || value === "") return 0;
       const n = Number(c[key]);
       return Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0;
     };
 
     return NextResponse.json({
-      mode: 'live',
+      mode: "live",
       amount_bdt: parsed.amount_bdt ?? null,
       date: parsed.date ?? null,
       shop: parsed.shop ?? null,
       category: parsed.category ?? null,
       notes: parsed.notes ?? null,
       confidence: {
-        amount: score('amount', parsed.amount_bdt),
-        date: score('date', parsed.date),
-        shop: score('shop', parsed.shop),
+        amount: score("amount", parsed.amount_bdt),
+        date: score("date", parsed.date),
+        shop: score("shop", parsed.shop),
       },
     });
   } catch (error) {
-    const timedOut = error instanceof Error && error.name === 'TimeoutError';
+    const timedOut = error instanceof Error && error.name === "TimeoutError";
     return NextResponse.json(
       {
         error: timedOut
-          ? 'The reader took too long. Enter the fields by hand.'
-          : 'Could not reach the reader. Enter the fields by hand.',
+          ? "The reader took too long. Enter the fields by hand."
+          : "Could not reach the reader. Enter the fields by hand.",
       },
       { status: 502 },
     );

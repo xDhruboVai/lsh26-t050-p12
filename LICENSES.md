@@ -8,12 +8,13 @@ Generated from `npx license-checker --production` and reconciled by hand. The ru
 
 | Package | Version | Licence | Used for |
 |---|---|---|---|
-| next | 15.5.24 | MIT | Application framework, routing, and the single API route |
+| @neondatabase/serverless | 1.1.0 | MIT | Serverless Postgres access for accounts and ledger data |
+| next | 15.5.24 | MIT | Application framework, routing, API routes and server actions |
 | react | 19.x | MIT | UI rendering |
 | react-dom | 19.x | MIT | DOM renderer |
-| zustand | 5.x | MIT | Client state, persisted to localStorage |
+| zustand | 5.x | MIT | Per-render-tree client state and non-destructive case previews |
 
-Four production dependencies. Receipt reading calls the Gemini REST endpoint with the platform `fetch`, so it adds no package.
+Five production dependencies. Receipt reading calls the Gemini REST endpoint with the platform `fetch`, so it adds no package.
 
 ## Direct development dependencies
 
@@ -33,8 +34,8 @@ Pulled in by the packages above. Licence totals for the production tree:
 
 | Licence | Count |
 |---|---|
-| MIT | 14 |
-| Apache-2.0 | 2 |
+| MIT | 15 |
+| Apache-2.0 | 3 |
 | ISC | 2 |
 | BSD-3-Clause | 1 |
 | 0BSD | 1 |
@@ -42,12 +43,12 @@ Pulled in by the packages above. Licence totals for the production tree:
 
 Counts are indicative; regenerate before submitting with the command below.
 
-`caniuse-lite` is the CC-BY-4.0 entry: a browser-support **data set** used by the build toolchain, attribution-only and commercially usable. It ships no code into the application.
+`caniuse-lite` is the CC-BY-4.0 entry: a browser-support **data set** used by the build toolchain, attribution-only and commercially usable. It ships no code into the application. The private root package can appear as `UNLICENSED` in some tool output even though its source licence is declared as MIT in `package.json`; the reproducible command below excludes that root entry.
 
 Reproduce with:
 
 ```bash
-npx license-checker --production --summary
+npx license-checker --production --summary --excludePackages lsh26-t050-p12@1.0.0
 ```
 
 ## Optional binaries not used
@@ -61,7 +62,7 @@ npx license-checker --production --summary
 | Service | Terms | Used for |
 |---|---|---|
 | Vercel | Commercial hosting, free tier | Deployment and the live URL |
-| Google Gemini API — `gemini-2.0-flash` | Google APIs Terms of Service / Gemini API Additional Terms | Reading amount, date and shop from bill photos |
+| Google Gemini API — `gemini-3.6-flash` | Google APIs Terms of Service / Gemini API Additional Terms | Reading amount, date and shop from bill photos |
 
 ## Fonts, icons and assets
 
@@ -78,12 +79,12 @@ No stock photography, illustration, audio or icon set is used.
 
 | Item | Source | Notes |
 |---|---|---|
-| `data/cases.json` | Provided by LofiStack Hackathon 2026 | The 25 public P12 cases, used to seed the app and as fixtures for `npm run verify` |
+| `data/cases.json` | Provided by LofiStack Hackathon 2026 | The 25 public P12 cases, available in the case-preview picker and used by `npm run verify` |
 | DPS interest rule and rate | Carried inside each case | Read at runtime and displayed in the app; not hardcoded |
 
 ## AI tool use
 
-Claude was used as a coding assistant during the build window, as permitted by the rulebook. Gemini 2.0 Flash is used at runtime by the application itself to read receipt photos. All source code in this repository was written during the event; no pre-written solution code for this problem existed beforehand. The repository history is preserved, and `Event.md` records the repository state at the start of the event.
+Claude and Codex were used as coding assistants during the build window, as permitted by the rulebook. Gemini 3.6 Flash is used at runtime by the application itself to read receipt photos. All source code in this repository was written during the event; no pre-written solution code for this problem existed beforehand. The repository history is preserved, and `Event.md` records the repository state at the start of the event.
 
 ## Our own code
 

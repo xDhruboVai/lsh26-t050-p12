@@ -11,7 +11,7 @@ LofiStack Hackathon 2026 · Problem P12 · Tier 02 · AI and Automation · Team 
 
 A mobile-first web app for a salaried person in Dhaka who knows their income and has no idea where the money goes. It records spending with almost no typing — including straight from a photo of a bill — shows where the month went, forecasts the rest of it, and puts a real date on every savings goal.
 
-Open the live URL on a phone or a laptop. No install, no account, no setup.
+Open the live URL on a phone or a laptop. No install or local setup is required; the demo credentials are shown on the sign-in screen.
 
 **For judges:** the app is behind a login, but you do not need to register. Sign in with
 
@@ -27,7 +27,7 @@ That account already holds two months of spending and two savings pockets, so ev
 
 Set a monthly salary. Add an expense by form, or tap **Photograph a bill** — on a phone that opens the rear camera directly.
 
-The app sends the photo to Gemini 2.0 Flash, which returns **amount, date and shop** with a confidence score per field under a strict JSON schema. Every value it read is shown **before anything is saved**.
+The app sends the photo to Gemini 3.6 Flash, which returns **amount, date and shop** with a confidence score per field under a strict JSON schema. Every value it read is shown **before anything is saved**.
 
 Uncertainty is never hidden. Any field scoring below **0.75** is rendered **empty and marked "check this"** — the app never fills in an amount it guessed. Save stays disabled until amount, date and shop are present, and every field stays editable. Nothing reaches the store until you press save.
 
@@ -51,13 +51,13 @@ projectedMonthTotal = spentThisMonth + restOfMonth
 projectedLeft       = salary - projectedMonthTotal        // negative means short
 ```
 
-The variable part is computed as a single rounded division (`variableSpent × daysRemaining / daysElapsed`) rather than a rounded daily rate multiplied out, so `spent + rest === projected` holds exactly in paisa. `verify.ts` asserts it on all 25 cases.
+Per the supplied rule, every expense already recorded this month is variable; only a last-month category/shop pair absent this month is recurring and still due. The variable part is computed as a single rounded division (`variableSpent × daysRemaining / daysElapsed`) rather than a rounded daily rate multiplied out, so `spent + rest === projected` holds exactly in paisa. `verify.ts` asserts it on all 25 cases.
 
-Insights are **generated from the live numbers**, never fixed text. Six candidates are built and ranked — largest category and its share of salary, largest month-over-month rise, single largest expense, projected shortfall or headroom, bills not yet paid, and any secondary category over 15% of salary — and the strongest are shown. All 25 public cases produce a **different** set; the verify script fails the build if any two match.
+Insights are **generated from the live numbers**, never fixed text. Six candidates are built and ranked — largest category and its share of salary, largest month-over-month rise, single largest expense, projected shortfall or headroom, bills not yet paid, and any secondary category over 15% of salary — and the strongest are shown. Every visible insight names a category and an amount. All 25 public cases produce a **different** set; the verify script fails the build if any two match.
 
 ### 4. Savings pockets, completion dates, and DPS
 
-Each pocket has a name, item, target and monthly contribution.
+Create, remove and edit pockets. Each has a name, item, target and monthly contribution.
 
 **Completion dates come from the forecast, not from target ÷ contribution:**
 
@@ -73,9 +73,11 @@ when a pocket completes, its share passes to the pockets behind it
 
 The first contribution lands on the 1st of the month **after** `today`, because this month's salary is already partly spent and the forecast covers it.
 
-If the forecast leaves no surplus, the pocket is reported **"not reachable at current spending"** with the monthly cut needed to fund it — rather than a fabricated date. Seven of the 25 public cases project a shortfall and land in exactly this state.
+If the forecast leaves no surplus, the pocket is reported **"not reachable at current spending"** with the monthly cut needed to fund it — rather than a fabricated date. Thirteen of the 25 public cases project a shortfall and land in exactly this state.
 
 Changing a pocket's monthly contribution re-dates every pocket immediately.
+
+The **What if** control cuts the selected category&rsquo;s remaining projected spend by 0–50% and shows the before/after completion date for every pocket immediately.
 
 **DPS.** The rate is read from the case (7.50%–10.00% across the public set) and printed on screen with the rule. Interest is added exactly as the case states:
 
@@ -118,7 +120,9 @@ npm run dev                    # http://localhost:3000
 | `npm run db:migrate` | Applies the schema and creates the demo account. Idempotent |
 | `npm run typecheck` | `tsc --noEmit` |
 
-`npm run verify` prints a row per case and fails loudly on any arithmetic that does not reconcile. `npm run goalcheck` goes further and drives the live app, including a real receipt through the extract route: 27 checks, all passing.
+`npm run verify` prints a row per case and fails loudly on any arithmetic that does not reconcile. `npm run goalcheck` goes further and drives a running app, including a real receipt through the extract route.
+
+For public and private judging cases, open **Profile → Test a case**. The 25 public fixtures are available in a picker, and a pasted single-case or full fixture JSON opens as a non-destructive local preview. Account data is restored with **Return to account**.
 
 Deployed with `vercel --prod`. `GEMINI_API_KEY` and `DATABASE_URL` are set as Vercel environment variables.
 
@@ -143,7 +147,9 @@ lib/caseLoader.ts     case JSON -> state, tolerant of missing fields
 lib/engine/           summary (2) · forecast (3) · pockets (4)
 lib/store.ts          zustand + persist, derived selectors
 app/                  dashboard · add · forecast · pockets
-app/api/extract/      receipt vision, the only server code
+app/api/extract/      receipt vision
+app/api/ledger/       authenticated ledger mutations
+app/actions/auth.ts   account and session actions
 scripts/verify.ts     25-case invariant harness
 ```
 
@@ -189,14 +195,13 @@ Full third-party list with licences: [`LICENSES.md`](./LICENSES.md).
 - The forecast uses a flat daily rate for variable spending. It does not model weekday and weekend differences, or salary-day effects.
 - Pocket funding priority is list order. There is no drag-to-reorder.
 - Recurring detection matches on exact category and shop. A shop that changes its printed name between months reads as two separate merchants.
-- Data is per-browser (`localStorage`). No accounts, no sync across devices.
+- Account data is stored in Neon Postgres. Loaded judging cases are deliberately local previews and never overwrite the account.
 - Public cases carry two months, so month-over-month comparison has exactly one prior month to work with.
 
 ## Next steps
 
-- Auto-mark an expense recurring once the same shop and a similar amount appear two months running (bonus 2)
-- A "what if" control that cuts one category by a percentage and re-dates every pocket (bonus 3) — the shortfall figure on unreachable pockets is already the input for it
 - History beyond the two months a case carries
+- User-controlled pocket priority ordering
 - Bangla numerals and date formatting
 
 ---

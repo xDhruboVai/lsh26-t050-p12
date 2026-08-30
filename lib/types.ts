@@ -1,13 +1,21 @@
-import type { ISODate, MonthKey } from './dates';
+import type { ISODate, MonthKey } from "./dates";
 
 export const CATEGORIES = [
-  'Rent', 'Groceries', 'Food', 'Transport', 'Utilities',
-  'Mobile', 'Health', 'Education', 'Entertainment', 'Clothing',
+  "Rent",
+  "Groceries",
+  "Food",
+  "Transport",
+  "Utilities",
+  "Mobile",
+  "Health",
+  "Education",
+  "Entertainment",
+  "Clothing",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
-export type ExpenseSource = 'seed' | 'manual' | 'receipt';
+export type ExpenseSource = "seed" | "manual" | "receipt";
 
 export interface FieldConfidence {
   amount: number;
@@ -76,13 +84,13 @@ export interface MonthSummary {
 }
 
 export type InsightKind =
-  | 'top-category'
-  | 'biggest-rise'
-  | 'biggest-expense'
-  | 'salary-share'
-  | 'shortfall'
-  | 'recurring-due'
-  | 'underspend';
+  | "top-category"
+  | "biggest-rise"
+  | "biggest-expense"
+  | "salary-share"
+  | "shortfall"
+  | "recurring-due"
+  | "underspend";
 
 export interface Insight {
   id: string;
@@ -90,7 +98,7 @@ export interface Insight {
   text: string;
   category?: Category;
   amountPaisa: number;
-  tone: 'warn' | 'info' | 'good';
+  tone: "warn" | "info" | "good";
 }
 
 export interface RecurringItem {
@@ -99,6 +107,8 @@ export interface RecurringItem {
   shop: string;
   expectedPaisa: number;
   seenThisMonth: boolean;
+  /** Same shop in both months and the totals are within 10%. */
+  autoRecurring: boolean;
 }
 
 export interface Forecast {
@@ -108,7 +118,6 @@ export interface Forecast {
   daysRemaining: number;
   spentThisMonthPaisa: number;
   variableSpentPaisa: number;
-  recurringSpentPaisa: number;
   variableDailyPaisa: number;
   recurringDuePaisa: number;
   restOfMonthPaisa: number;
